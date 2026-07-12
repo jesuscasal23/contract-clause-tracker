@@ -177,12 +177,18 @@ button `.375rem`, card/input `.5rem`, pills fully rounded.
 - ✅ **Top-level `README.md`** (quick start, architecture, design decisions, API, dev,
   testing, extension notes).
 
+- ✅ **`docker compose up --build` verified end-to-end**: both containers healthy
+  (frontend nginx `:4200`, backend uvicorn `:8000`); backend seeds 7 clause types on a
+  fresh named volume. Drove the **containerized production build** in headless Chrome with
+  **real CORS** (no bypass) — upload → segment (25 sentences) → label 2 clauses → persisted
+  via cross-origin fetch. `RESULT_OK`.
+- ✅ **Pushed to GitHub (public)**: https://github.com/jesuscasal23/contract-clause-tracker
+  (`main`). `.gitignore` keeps deps/venv/db/build output out (540 files, 3.6 MB committed).
+
 **Pending / not started**
-- ⬜ Full `docker compose up` on a machine where ports **8000/4200 are free** (held here by
-  the unrelated `todo-app`, so the two containers were verified independently, not together).
 - ⬜ Component-level polish beyond tokens: button hover → `#d14424`, card shadow, etc.
 - ⬜ Reharmonize the clause-type highlight palette (`requirements.md` §5.5) vs. orange.
-- ⬜ `git init` the consolidated repo + push to GitHub (the deliverable).
+- ⬜ Optional: add a favicon (browser requests `/favicon.ico` → harmless 404 today).
 
 ---
 
