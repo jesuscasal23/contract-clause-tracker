@@ -37,6 +37,7 @@
   --popover-foreground: #22252b;
   /* ▼▼▼ BRAND COLOR — Legartis primary orange ▼▼▼ */
   --primary: #fa5b05;
+  --primary-hover: #d14424;         /* Legartis darker orange (button hover) */
   --primary-foreground: #ffffff;
   /* ▲▲▲ BRAND COLOR ▲▲▲ */
   --secondary: #f6f6f6;             /* Legartis lightest-gray */
@@ -100,4 +101,11 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Brand hover: primary buttons/links darken to the Legartis hover orange (#d14424).
+   The library's default button variant only shifts background on anchors; this unlayered,
+   high-specificity rule applies the brand hover to every primary button. Uses the token. */
+[data-slot='button'].bg-primary:hover {
+  background-color: var(--primary-hover);
 }

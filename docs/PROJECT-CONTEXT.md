@@ -185,10 +185,14 @@ button `.375rem`, card/input `.5rem`, pills fully rounded.
 - ✅ **Pushed to GitHub (public)**: https://github.com/jesuscasal23/contract-clause-tracker
   (`main`). `.gitignore` keeps deps/venv/db/build output out (540 files, 3.6 MB committed).
 
+- ✅ **Polish**: brand favicon (`projects/app/public/favicon.svg`, orange "C" — removes the
+  `/favicon.ico` 404) and a primary-button hover → `#d14424` (`--primary-hover` token +
+  an app-level rule, since the library's default variant only hovers anchors). Both
+  verified in the running container.
+
 **Pending / not started**
-- ⬜ Component-level polish beyond tokens: button hover → `#d14424`, card shadow, etc.
-- ⬜ Reharmonize the clause-type highlight palette (`requirements.md` §5.5) vs. orange.
-- ⬜ Optional: add a favicon (browser requests `/favicon.ico` → harmless 404 today).
+- ⬜ Further component polish (e.g. card shadow) + clause-palette reharmonization vs. orange
+  (`requirements.md` §5.5).
 
 ---
 

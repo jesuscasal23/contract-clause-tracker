@@ -18,6 +18,7 @@
             "browser": "projects/app/src/main.ts",
             "index": "projects/app/src/index.html",
             "tsConfig": "projects/app/tsconfig.app.json",
+            "assets": [{ "glob": "**/*", "input": "projects/app/public" }],
             "styles": ["projects/app/src/styles.css"]
           },
           "configurations": {
