@@ -1,0 +1,9 @@
+node_modules
+dist
+.angular
+.git
+storybook-static
+out-tsc
+**/*.log
+Dockerfile
+.dockerignore

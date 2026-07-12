@@ -1,0 +1,95 @@
+# legartis-ui
+
+> Angular 21 component library built on spartan/ui ("helm"). Components are shadcn-style:
+> the styled source lives in `libs/ui/<name>/` and you own it. Styling is Tailwind v4 +
+> semantic CSS variables. Every component is browsable in Storybook.
+
+## How to use a component
+- Each component is exposed under the import alias `@spartan-ng/helm/<name>`.
+- Import its directive bundle and add it to a standalone component's `imports`:
+  ```ts
+  import { Component } from '@angular/core';
+  import { HlmButtonImports } from '@spartan-ng/helm/button';
+
+  @Component({
+    selector: 'app-example',
+    imports: [...HlmButtonImports],
+    template: `<button hlmBtn variant="outline">Click</button>`,
+  })
+  export class Example {}
+  ```
+- Most components are attribute directives applied to native elements (e.g. `<button hlmBtn>`,
+  `<input hlmInput>`) or custom elements (e.g. `<hlm-checkbox>`). See the selector column.
+- To customize a component, edit its source in `libs/ui/<name>/src/lib/` directly.
+
+## Theming
+- All colors are CSS variables in `projects/playground/src/styles.css` (`:root` + `:root.dark`).
+- Change the brand by editing `--primary` / `--primary-foreground` (OKLCH). Everything using
+  `bg-primary` / `text-primary` updates automatically. Do NOT hardcode hex colors in components.
+
+## Storybook
+- Stories are co-located: `libs/ui/<name>/src/lib/<name>.stories.ts`.
+- Run: `pnpm storybook`. Build: `pnpm build-storybook`.
+- Theme toolbar (top) toggles light/dark.
+
+## Components (57)
+
+| Component | Import alias | Directive bundle | Selector(s) |
+| --- | --- | --- | --- |
+| accordion | `@spartan-ng/helm/accordion` | `HlmAccordionImports` | `hlm-accordion-content` `[hlmAccordionItem],hlm-accordion-item` `hlm-accordion-trigger` |
+| alert | `@spartan-ng/helm/alert` | `HlmAlertImports` | `[hlmAlertAction]` `[hlmAlertDescription]` `[hlmAlertTitle]` |
+| alert-dialog | `@spartan-ng/helm/alert-dialog` | `HlmAlertDialogImports` | `button[hlmAlertDialogAction]` `button[hlmAlertDialogCancel]` `[hlmAlertDialogContent],hlm-alert-dialog-content` |
+| aspect-ratio | `@spartan-ng/helm/aspect-ratio` | `HlmAspectRatioImports` | `[hlmAspectRatio]` |
+| autocomplete | `@spartan-ng/helm/autocomplete` | `HlmAutocompleteImports` | `[hlmAutocompleteContent],hlm-autocomplete-content` `[hlmAutocompleteEmpty],hlm-autocomplete-empty` `[hlmAutocompleteGroup]` |
+| avatar | `@spartan-ng/helm/avatar` | `HlmAvatarImports` | `[hlmAvatarBadge],hlm-avatar-badge` `[hlmAvatarFallback]` `[hlmAvatarGroupCount],hlm-avatar-group-count` |
+| badge | `@spartan-ng/helm/badge` | `HlmBadgeImports` | `[hlmBadge],hlm-badge` |
+| breadcrumb | `@spartan-ng/helm/breadcrumb` | `HlmBreadcrumbImports` | `hlm-breadcrumb-ellipsis` `[hlmBreadcrumbItem]` `[hlmBreadcrumbLink]` |
+| button | `@spartan-ng/helm/button` | `HlmButtonImports` | `button[hlmBtn], a[hlmBtn]` |
+| button-group | `@spartan-ng/helm/button-group` | `HlmButtonGroupImports` | `[hlmButtonGroupSeparator],hlm-button-group-separator` `[hlmButtonGroupText],hlm-button-group-text` `[hlmButtonGroup],hlm-button-group` |
+| calendar | `@spartan-ng/helm/calendar` | `HlmCalendarImports` | `hlm-calendar-multi` `hlm-calendar-range` `hlm-calendar` |
+| card | `@spartan-ng/helm/card` | `HlmCardImports` | `[hlmCardAction]` `[hlmCardContent]` `[hlmCardDescription]` |
+| carousel | `@spartan-ng/helm/carousel` | `HlmCarouselImports` | `[hlmCarouselContent],hlm-carousel-content` `[hlmCarouselItem],hlm-carousel-item` `button[hlm-carousel-next], button[hlmCarouselNext]` |
+| checkbox | `@spartan-ng/helm/checkbox` | `HlmCheckboxImports` | `hlm-checkbox` |
+| collapsible | `@spartan-ng/helm/collapsible` | `HlmCollapsibleImports` | `[hlmCollapsibleContent],hlm-collapsible-content` `button[hlmCollapsibleTrigger]` `[hlmCollapsible],hlm-collapsible` |
+| combobox | `@spartan-ng/helm/combobox` | `HlmComboboxImports` | `input[hlmComboboxChipInput]` `button[hlmComboboxChipRemove]` `hlm-combobox-chip` |
+| command | `@spartan-ng/helm/command` | `HlmCommandImports` | `hlm-command-dialog` `[hlmCommandEmptyState]` `[hlmCommandEmpty]` |
+| context-menu | `@spartan-ng/helm/context-menu` | `HlmContextMenuImports` | `[hlmContextMenuTrigger]` |
+| date-picker | `@spartan-ng/helm/date-picker` | `HlmDatePickerImports` | `hlm-date-multi-input` `[hlmDatePickerAnchor]` `hlm-date-picker-input` |
+| dialog | `@spartan-ng/helm/dialog` | `HlmDialogImports` | `button[hlmDialogClose]` `hlm-dialog-content` `[hlmDialogDescription]` |
+| drawer | `@spartan-ng/helm/drawer` | `HlmDrawerImports` | `button[hlmDrawerClose]` `hlm-drawer-content` `[hlmDrawerDescription]` |
+| dropdown-menu | `@spartan-ng/helm/dropdown-menu` | `HlmDropdownMenuImports` | `hlm-dropdown-menu-checkbox-indicator` `[hlmDropdownMenuCheckboxCdk]` `[hlmDropdownMenuCheckbox],[hlmDropdownMenuCheckboxItem]` |
+| empty | `@spartan-ng/helm/empty` | `HlmEmptyImports` | `[hlmEmptyContent],hlm-empty-content` `[hlmEmptyDescription]` `[hlmEmptyHeader],hlm-empty-header` |
+| field | `@spartan-ng/helm/field` | `HlmFieldImports` | `[hlmFieldContent],hlm-field-content` `[hlmFieldDescription],hlm-field-description` `hlm-field-error` |
+| hover-card | `@spartan-ng/helm/hover-card` | `HlmHoverCardImports` | `[hlmHoverCardContent],hlm-hover-card-content` `[hlmHoverCardPortal],hlm-hover-card-portal` `[hlmHoverCardTrigger]` |
+| input | `@spartan-ng/helm/input` | `HlmInputImports` | `[hlmInput]` |
+| input-group | `@spartan-ng/helm/input-group` | `HlmInputGroupImports` | `[hlmInputGroupAddon],hlm-input-group-addon` `button[hlmInputGroupButton]` `input[hlmInputGroupInput]` |
+| input-otp | `@spartan-ng/helm/input-otp` | `HlmInputOtpImports` | `hlm-input-otp-fake-caret` `[hlmInputOtpGroup],hlm-input-otp-group` `hlm-input-otp-separator` |
+| item | `@spartan-ng/helm/item` | `HlmItemImports` | `[hlmItemActions],hlm-item-actions` `[hlmItemContent],hlm-item-content` `[hlmItemDescription],hlm-item-description` |
+| kbd | `@spartan-ng/helm/kbd` | `HlmKbdImports` | `kbd[hlmKbdGroup]` `kbd[hlmKbd]` |
+| label | `@spartan-ng/helm/label` | `HlmLabelImports` | `[hlmLabel]` |
+| menubar | `@spartan-ng/helm/menubar` | `HlmMenubarImports` | `button[hlmMenubarTrigger]` `[hlmMenubar],hlm-menubar` |
+| native-select | `@spartan-ng/helm/native-select` | `HlmNativeSelectImports` | `optgroup[hlmNativeSelectOptGroup]` `option[hlmNativeSelectOption]` `hlm-native-select` |
+| navigation-menu | `@spartan-ng/helm/navigation-menu` | `HlmNavigationMenuImports` | `[hlmNavigationMenuContent],hlm-navigation-menu-content` `li[hlmNavigationMenuItem]` `a[hlmNavigationMenuLink]` |
+| pagination | `@spartan-ng/helm/pagination` | `HlmPaginationImports` | `hlm-numbered-pagination-query-params` `hlm-numbered-pagination` `ul[hlmPaginationContent]` |
+| popover | `@spartan-ng/helm/popover` | `HlmPopoverImports` | `[hlmPopoverContent],hlm-popover-content` `[hlmPopoverDescription]` `[hlmPopoverHeader],hlm-popover-header` |
+| progress | `@spartan-ng/helm/progress` | `HlmProgressImports` | `[hlmProgressIndicator],hlm-progress-indicator` `hlm-progress,[hlmProgress]` |
+| radio-group | `@spartan-ng/helm/radio-group` | `HlmRadioGroupImports` | `[hlmRadioGroup],hlm-radio-group` `hlm-radio-indicator` `hlm-radio` |
+| resizable | `@spartan-ng/helm/resizable` | `HlmResizableImports` | `[hlmResizableGroup],hlm-resizable-group` `hlm-resizable-handle` `[hlmResizablePanel],hlm-resizable-panel` |
+| scroll-area | `@spartan-ng/helm/scroll-area` | `HlmScrollAreaImports` | `ng-scrollbar[hlm],ng-scrollbar[hlmScrollbar]` |
+| select | `@spartan-ng/helm/select` | `HlmSelectImports` | `hlm-select-content` `[hlmSelectGroup],hlm-select-group` `hlm-select-item` |
+| separator | `@spartan-ng/helm/separator` | `HlmSeparatorImports` | `[hlmSeparator],hlm-separator` |
+| sheet | `@spartan-ng/helm/sheet` | `HlmSheetImports` | `button[hlmSheetClose]` `hlm-sheet-content` `[hlmSheetDescription]` |
+| sidebar | `@spartan-ng/helm/sidebar` | `HlmSidebarImports` | `[hlmSidebarContent],hlm-sidebar-content` `[hlmSidebarFooter],hlm-sidebar-footer` `button[hlmSidebarGroupAction]` |
+| skeleton | `@spartan-ng/helm/skeleton` | `HlmSkeletonImports` | `[hlmSkeleton],hlm-skeleton` |
+| slider | `@spartan-ng/helm/slider` | `HlmSliderImports` | `hlm-slider, brn-slider [hlm]` |
+| sonner | `@spartan-ng/helm/sonner` | `HlmToasterImports` | `hlm-toaster` |
+| spinner | `@spartan-ng/helm/spinner` | `HlmSpinnerImports` | `hlm-spinner` |
+| switch | `@spartan-ng/helm/switch` | `HlmSwitchImports` | `brn-switch-thumb[hlm],[hlmSwitchThumb]` `hlm-switch` |
+| table | `@spartan-ng/helm/table` | `HlmTableImports` | `div[hlmTableContainer]` `table[hlmTable]` `thead[hlmTHead],thead[hlmTableHeader]` |
+| tabs | `@spartan-ng/helm/tabs` | `HlmTabsImports` | `ng-template[hlmTabsContentLazy]` `[hlmTabsContent]` `[hlmTabsList],hlm-tabs-list` |
+| textarea | `@spartan-ng/helm/textarea` | `HlmTextareaImports` | `[hlmTextarea]` |
+| toggle | `@spartan-ng/helm/toggle` | `HlmToggleImports` | `button[hlmToggle]` |
+| toggle-group | `@spartan-ng/helm/toggle-group` | `HlmToggleGroupImports` | `button[hlmToggleGroupItem]` `[hlmToggleGroup],hlm-toggle-group` |
+| tooltip | `@spartan-ng/helm/tooltip` | `HlmTooltipImports` | `[hlmTooltip]` |
+| typography | `@spartan-ng/helm/typography` | `HlmTypographyImports` | `[hlmBlockquote]` `[hlmCode]` `[hlmH1]` |
+| utils | `@spartan-ng/helm/utils` | _(helpers only)_ |  |

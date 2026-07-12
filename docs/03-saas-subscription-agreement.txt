@@ -1,0 +1,27 @@
+SAAS SUBSCRIPTION AGREEMENT
+
+This SaaS Subscription Agreement ("Agreement") governs access to the software-as-a-service platform ("Platform") provided by Cloudpeak Technologies Inc. ("Cloudpeak") to the subscribing customer ("Customer").
+
+1. Access and Use
+Cloudpeak grants Customer a non-exclusive, non-transferable right to access and use the Platform during the Subscription Term. Customer shall not reverse engineer, decompile, or attempt to derive the source code of the Platform. Customer is responsible for maintaining the confidentiality of its account credentials.
+
+2. Subscription and Fees
+The subscription begins on the start date specified in the Order Form and continues for the period stated therein. Subscription fees are billed annually in advance and are non-refundable except as expressly provided herein. Cloudpeak may increase fees upon renewal by providing at least forty-five (45) days notice prior to the end of the then-current term.
+
+3. Service Levels
+Cloudpeak shall use commercially reasonable efforts to make the Platform available 99.9% of the time, measured monthly, excluding scheduled maintenance. If Cloudpeak fails to meet this service level, Customer shall be entitled to a service credit as its sole and exclusive remedy. Scheduled maintenance windows will be communicated at least twenty-four (24) hours in advance.
+
+4. Data and Privacy
+Customer retains all right, title, and interest in and to Customer Data. Cloudpeak shall implement appropriate technical and organizational measures to protect Customer Data against unauthorized access. Cloudpeak shall process Customer Data only in accordance with Customer's documented instructions and applicable data protection laws (e.g., the GDPR).
+
+5. Warranties and Disclaimers
+Cloudpeak warrants that the Platform will perform materially in accordance with its documentation. EXCEPT AS EXPRESSLY PROVIDED, THE PLATFORM IS PROVIDED "AS IS" WITHOUT WARRANTIES OF ANY KIND. Cloudpeak does not warrant that the Platform will be uninterrupted or error-free.
+
+6. Limitation of Liability
+Notwithstanding anything to the contrary, Cloudpeak's total liability arising out of or related to this Agreement shall not exceed the fees paid by Customer in the twelve (12) months preceding the claim. In no event shall Cloudpeak be liable for any loss of profits, loss of data, or business interruption. These limitations apply to the maximum extent permitted by applicable law.
+
+7. Termination
+Either party may terminate this Agreement for convenience upon ninety (90) days written notice prior to the end of the then-current Subscription Term. Either party may terminate immediately upon a material breach that remains uncured for thirty (30) days. Upon termination, Cloudpeak shall make Customer Data available for export for a period of thirty (30) days.
+
+8. Miscellaneous
+Neither party may assign this Agreement without the prior written consent of the other party, except in connection with a merger or sale of substantially all of its assets. This Agreement constitutes the entire agreement between the parties with respect to its subject matter.

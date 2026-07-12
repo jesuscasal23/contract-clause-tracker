@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Dev database (backend seeds on startup)
+*.db
+backend/data/
+
+# Build output
+dist/
+.angular/
+out-tsc/
+storybook-static/
+
+# Logs
+*.log
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
