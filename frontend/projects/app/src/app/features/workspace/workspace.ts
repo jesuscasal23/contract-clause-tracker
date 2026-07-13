@@ -66,6 +66,9 @@ export class Workspace {
   readonly filterOpen = signal(false);
   readonly drawerOpen = signal(false);
 
+  /** Document awaiting delete confirmation (drives the confirm modal). */
+  readonly pendingDelete = signal<DocumentListItem | null>(null);
+
   // upload modal state
   readonly uploadOpen = signal(false);
   readonly uploadStatus = signal<'idle' | 'busy' | 'done'>('idle');
@@ -170,8 +173,20 @@ export class Workspace {
     return this.store.selectedDocId() === id;
   }
 
-  deleteDoc(id: number, ev: Event): void {
+  requestDelete(doc: DocumentListItem, ev: Event): void {
     ev.stopPropagation();
+    this.pendingDelete.set(doc);
+  }
+
+  cancelDelete(): void {
+    this.pendingDelete.set(null);
+  }
+
+  confirmDelete(): void {
+    const doc = this.pendingDelete();
+    if (!doc) return;
+    this.pendingDelete.set(null);
+    const id = doc.id;
     this.api.deleteDocument(id).subscribe({
       next: () => {
         const wasOpen = this.store.selectedDocId() === id;
@@ -187,6 +202,10 @@ export class Workspace {
       },
       error: () => toast.error('Delete failed'),
     });
+  }
+
+  labelCount(d: DocumentListItem): number {
+    return (d.clause_summary ?? []).reduce((sum, c) => sum + c.count, 0);
   }
 
   // ---- upload ----

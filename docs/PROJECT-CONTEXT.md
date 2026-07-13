@@ -214,7 +214,9 @@ button `.375rem`, card/input `.5rem`, pills fully rounded.
   flow is a state machine: orange spinner (held ≥500 ms so fast uploads don't flash) →
   animated check-mark draw ("Upload complete", ~1.2 s) → modal closes and the new
   document opens. Verified headless: X-close, spinner→check→auto-close, neighbor-select
-  on delete.
+  on delete. Row deletes now require **confirmation**: the ✕ opens a modal naming the
+  file (and its annotation count) with Cancel / destructive Delete; backdrop click
+  cancels. Verified headless: cancel & backdrop keep the doc, confirm deletes it.
 
 - ✅ **Seed data includes a sample contract** so a fresh install never starts empty:
   `backend/app/seed_data/01-master-services-agreement.txt` (a copy of the docs/ example,
