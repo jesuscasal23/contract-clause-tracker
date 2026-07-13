@@ -206,6 +206,16 @@ button `.375rem`, card/input `.5rem`, pills fully rounded.
   end-to-end in headless Chrome against the rebuilt containers (16/16 checks + mobile
   drawer smoke).
 
+- ✅ **Default document selection + upload-modal polish.** Landing on `/` auto-opens the
+  most recent document (deep-links unaffected — the redirect only fires when the URL is
+  exactly `/` after the list loads); deleting the open document selects its list
+  neighbor, so the center empty state only appears with zero documents. The upload modal
+  lost its Cancel button in favor of a top-right ✕ (hidden while busy), and the upload
+  flow is a state machine: orange spinner (held ≥500 ms so fast uploads don't flash) →
+  animated check-mark draw ("Upload complete", ~1.2 s) → modal closes and the new
+  document opens. Verified headless: X-close, spinner→check→auto-close, neighbor-select
+  on delete.
+
 - ✅ **Seed data includes a sample contract** so a fresh install never starts empty:
   `backend/app/seed_data/01-master-services-agreement.txt` (a copy of the docs/ example,
   shipped in the image) is segmented and inserted at startup via `seed_example_documents`

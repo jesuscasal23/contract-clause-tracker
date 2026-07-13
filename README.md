@@ -43,6 +43,8 @@ Everything happens on **one three-column workspace**: a left panel with the sear
 document list (search + filter + group + upload), the document/labeling view in the center,
 and the clause palette + per-document summary on the right. Picking a document on the left
 swaps the center — there is no separate landing page, and `/documents/:id` deep-links work.
+The most recent document opens automatically on launch, so the app never starts on an
+empty screen.
 
 ---
 
