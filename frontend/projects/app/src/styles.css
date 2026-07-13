@@ -100,6 +100,15 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* Legartis hero glow — recreated from legartis.ai's "Hero Background Gradient" asset
+       (two soft radial blooms over white, sampled from the source image):
+         orange rgb(252 132 41) upper-left of center, coral rgb(254 129 101) to its right.
+       Fixed attachment keeps the glow pinned to the viewport top, fading to white below. */
+    background-image:
+      radial-gradient(46rem 30rem at 86% 18rem, rgb(254 129 101 / 0.32), transparent 65%),
+      radial-gradient(52rem 32rem at 64% 4rem, rgb(252 132 41 / 0.34), transparent 65%);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
   }
 }
 
