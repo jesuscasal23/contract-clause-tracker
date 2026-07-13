@@ -10,7 +10,7 @@ from app.routers import annotations, clause_types, documents
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
-    init_db()  # create tables + seed the clause-type taxonomy
+    init_db()  # create tables + seed the clause-type taxonomy and sample contract
     yield
 
 

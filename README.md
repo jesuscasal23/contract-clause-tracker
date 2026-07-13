@@ -24,8 +24,9 @@ docker compose up --build
 > (nginx) and the FastAPI backend; the browser loads the app from `:4200` and calls the API
 > at `:8000` (the backend's CORS allow-list already includes `http://localhost:4200`).
 
-Try it with the sample contracts in [`docs/`](docs/) (`01-master-services-agreement.txt`,
-`02-employment-agreement.md`, `03-saas-subscription-agreement.txt`).
+A fresh database is seeded with one sample contract so the app never starts empty. Try the
+other sample contracts in [`docs/`](docs/) (`02-employment-agreement.md`,
+`03-saas-subscription-agreement.txt`).
 
 ---
 
@@ -50,14 +51,14 @@ swaps the center — there is no separate landing page, and `/documents/:id` dee
 ```
 ┌────────────────────┐        HTTP/JSON        ┌──────────────────────────┐
 │  Angular 21 (SPA)  │  ───────────────────▶   │  FastAPI + SQLModel      │
-│  Spartan-NG UI     │  ◀───────────────────   │  SQLite                  │
+│  Spartan-NG UI     │  ◀───────────────────   │  PostgreSQL              │
 │  re-skinned to     │                         │  pysbd segmentation      │
 │  the Legartis brand│                         └──────────────────────────┘
 └────────────────────┘
    nginx :4200                                       uvicorn :8000
 ```
 
-- **Backend** — Python, **FastAPI** + **SQLModel** (SQLAlchemy + Pydantic) over **SQLite**.
+- **Backend** — Python, **FastAPI** + **SQLModel** (SQLAlchemy + Pydantic) over **PostgreSQL**.
   Sentence segmentation with **pysbd** (legal text is full of `Inc.`, `e.g.`, `99.9%`,
   `Section 3.2`). Minimal by design.
 - **Frontend** — **Angular 21** (standalone, **zoneless**, signals) built on a **Spartan-NG**
@@ -178,9 +179,9 @@ options, cheapest first: few-shot LLM classification per sentence; embeddings + 
 clause-type prototype; or a classifier fine-tuned on the accumulated *confirmed* labels
 (the accept/reject stream is a ready-made training signal).
 
-**Scaling.** Move SQLite → PostgreSQL (schema is portable); add a full-text index for
-document search; run segmentation and auto-labeling as background jobs for large docs;
-introduce multi-user auth + an audit trail (who labeled what, when); paginate the dashboard.
+**Scaling.** Add a full-text index for document search; run segmentation and auto-labeling
+as background jobs for large docs; introduce multi-user auth + an audit trail (who labeled
+what, when); paginate the dashboard.
 
 **Product.** Free (multi-/sub-sentence) spans by relaxing the sentence-boundary constraint;
 clause export (CSV/JSON); cross-corpus clause search and diffing.

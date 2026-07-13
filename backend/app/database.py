@@ -24,11 +24,12 @@ def _enable_sqlite_foreign_keys(dbapi_connection, _record) -> None:
 
 
 def init_db() -> None:
-    from app.seed import seed_clause_types
+    from app.seed import seed_clause_types, seed_example_documents
 
     SQLModel.metadata.create_all(engine)
     with Session(engine) as session:
         seed_clause_types(session)
+        seed_example_documents(session)
 
 
 def get_session() -> Iterator[Session]:

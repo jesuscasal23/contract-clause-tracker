@@ -1,0 +1,24 @@
+MASTER SERVICES AGREEMENT
+
+This Master Services Agreement (the "Agreement") is entered into as of March 3, 2025 by and between Nimbus Software Inc. ("Provider") and Harbor Analytics LLC ("Client").
+
+1. Services
+Provider shall provide the professional services described in one or more statements of work (each, an "SOW") executed by the parties. Each SOW shall reference this Agreement and shall be governed by its terms. Provider shall perform the Services in a professional and workmanlike manner consistent with generally accepted industry standards.
+
+2. Fees and Payment
+Client shall pay Provider the fees set forth in the applicable SOW. Invoices are due within thirty (30) days of the invoice date. Late payments shall accrue interest at a rate of 1.5% per month, or the maximum rate permitted by law, whichever is lower.
+
+3. Term and Termination
+This Agreement shall commence on the Effective Date and continue until terminated in accordance with this Section 3. Either party may terminate this Agreement for convenience upon sixty (60) days prior written notice to the other party. Either party may terminate this Agreement immediately if the other party materially breaches the Agreement and fails to cure such breach within thirty (30) days after receiving written notice thereof.
+
+4. Confidentiality
+Each party may receive information that is confidential or proprietary to the other party (e.g., business plans, source code, or customer lists). The receiving party shall not disclose such Confidential Information to any third party without the prior written consent of the disclosing party. The obligations in this Section 4 shall survive termination of this Agreement for a period of five (5) years.
+
+5. Limitation of Liability
+In no event shall either party be liable to the other for any indirect, incidental, special, or consequential damages arising out of or related to this Agreement. The total aggregate liability of Provider under this Agreement shall not exceed the total fees paid by Client in the twelve (12) months preceding the event giving rise to the claim. The foregoing limitations shall not apply to a party's indemnification obligations or breach of its confidentiality obligations.
+
+6. Governing Law
+This Agreement shall be governed by and construed in accordance with the laws of the State of Delaware, without regard to its conflict of laws principles. Any dispute arising under this Agreement shall be resolved in the state or federal courts located in Wilmington, Delaware.
+
+7. Entire Agreement
+This Agreement, together with all SOWs, constitutes the entire agreement between the parties and supersedes all prior understandings. No amendment shall be effective unless made in writing and signed by both parties.

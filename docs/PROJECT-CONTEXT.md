@@ -206,6 +206,14 @@ button `.375rem`, card/input `.5rem`, pills fully rounded.
   end-to-end in headless Chrome against the rebuilt containers (16/16 checks + mobile
   drawer smoke).
 
+- ✅ **Seed data includes a sample contract** so a fresh install never starts empty:
+  `backend/app/seed_data/01-master-services-agreement.txt` (a copy of the docs/ example,
+  shipped in the image) is segmented and inserted at startup via `seed_example_documents`
+  in `app/seed.py` — but only when the documents table has **zero rows**, so user uploads
+  and deletions are never touched. Covered by `tests/test_seed.py` (fresh-DB insert +
+  offset integrity, idempotency, skip-when-data-exists); 25 pytest tests green. Verified
+  in the running stack: rebuild → doc appears in the UI; restart → still exactly one.
+
 **Pending / not started**
 - ⬜ Further component polish (e.g. card shadow) + clause-palette reharmonization vs. orange
   (`requirements.md` §5.5).
