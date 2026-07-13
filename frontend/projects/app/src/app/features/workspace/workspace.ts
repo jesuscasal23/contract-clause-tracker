@@ -114,6 +114,16 @@ export class Workspace {
     effect(() => {
       if (this.store.uploadRequests()) this.openUpload();
     });
+    // Fold the live summary into the base list: docs() is only fetched on
+    // load/search, so without this a doc labeled during the session reverts
+    // to its stale (possibly empty) summary once another doc is selected.
+    effect(() => {
+      const live = this.store.liveSummary();
+      if (!live) return;
+      this.docs.update((list) =>
+        list.map((d) => (d.id === live.docId ? { ...d, clause_summary: live.summary } : d)),
+      );
+    });
   }
 
   reload(): void {
