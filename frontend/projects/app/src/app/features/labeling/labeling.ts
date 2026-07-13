@@ -1,9 +1,11 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, computed, effect, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { toast } from 'ngx-sonner';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmSpinnerImports } from '@spartan-ng/helm/spinner';
 import { ApiService } from '../../core/api.service';
+import { WorkspaceStore } from '../../core/workspace-store';
 import { Annotation, ClauseType, DocumentDetail, Sentence } from '../../core/models';
 import { tint } from '../../core/color.util';
 
@@ -66,8 +68,9 @@ export class Labeling {
   private readonly api = inject(ApiService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly store = inject(WorkspaceStore);
 
-  private readonly docId = Number(this.route.snapshot.paramMap.get('id'));
+  private docId = NaN;
 
   readonly doc = signal<DocumentDetail | null>(null);
   readonly annotations = signal<Annotation[]>([]);
@@ -138,23 +141,50 @@ export class Labeling {
 
   constructor() {
     this.api.listClauseTypes().subscribe({ next: (t) => this.clauseTypes.set(t), error: () => {} });
-    this.load();
+    // The shell keeps this component mounted across /documents/:id changes,
+    // so react to param changes rather than reading the snapshot once.
+    this.route.paramMap
+      .pipe(takeUntilDestroyed())
+      .subscribe((pm) => this.load(Number(pm.get('id'))));
+    inject(DestroyRef).onDestroy(() => this.store.clearDoc(this.docId));
+    // Publish the live clause summary so the shell's left list stays in sync.
+    effect(() => {
+      const d = this.doc();
+      if (!d) return;
+      this.store.liveSummary.set({
+        docId: d.id,
+        summary: this.summary().map((r) => ({
+          clause_type_id: r.type.id,
+          name: r.type.name,
+          color: r.type.color,
+          count: r.count,
+        })),
+      });
+    });
   }
 
-  private load(): void {
-    if (Number.isNaN(this.docId)) {
+  private load(id: number): void {
+    this.docId = id;
+    this.closePopover();
+    this.doc.set(null);
+    this.annotations.set([]);
+    this.error.set(false);
+    if (Number.isNaN(id)) {
       this.error.set(true);
       this.loading.set(false);
       return;
     }
+    this.store.selectedDocId.set(id);
     this.loading.set(true);
-    this.api.getDocument(this.docId).subscribe({
+    this.api.getDocument(id).subscribe({
       next: (d) => {
+        if (this.docId !== id) return; // stale response after switching docs
         this.doc.set(d);
         this.annotations.set(d.annotations ?? []);
         this.loading.set(false);
       },
       error: () => {
+        if (this.docId !== id) return;
         this.error.set(true);
         this.loading.set(false);
         toast.error('Could not load document. Is the backend running on :8000?');

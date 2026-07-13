@@ -84,8 +84,9 @@ to stress the sentence splitter.
    palette + live "clauses in this document" summary) from the two-pane sketch, combined
    with a click-a-sentence → in-place popover labeling gesture from the popover sketch.
    Model suggestions (future) render as dashed highlights with Accept/Reject. Details in
-   `requirements.md` §5. Three screens: dashboard, upload (modal + honest loading state
-   for transfer + segmentation), labeling view.
+   `requirements.md` §5. Originally three screens (dashboard, upload modal, labeling view);
+   later **merged into one three-column workspace** (see §6) — the dashboard's search/list/
+   filter/group/upload became a persistent left panel, so there is no separate landing page.
 
 4. **Design system — reuse the `legartis-ui` Spartan-NG library**, re-skinned to the
    Legartis brand, instead of building components from scratch. It is a shadcn/ui port for
@@ -189,6 +190,21 @@ button `.375rem`, card/input `.5rem`, pills fully rounded.
   `/favicon.ico` 404) and a primary-button hover → `#d14424` (`--primary-hover` token +
   an app-level rule, since the library's default variant only hovers anchors). Both
   verified in the running container.
+
+- ✅ **UI reorganized into a single three-column workspace** (replaces the two-screen
+  dashboard + labeling split). A persistent `Workspace` shell (`features/workspace/`) owns
+  the slim top bar and a LEFT `w-80` panel — document search (live/debounced), a compact
+  clause-type filter menu + group-by toggle, "＋ Upload" (same two-phase modal), and the
+  document list as compact rows (meta line, tiny clause chips, active state, hover delete).
+  The CENTER is a `<router-outlet>`: `/documents/:id` renders the unchanged labeling view
+  (which keeps its RIGHT clause-palette + summary sidebar, now `xl:`), and `/` renders an
+  empty-state placeholder. `core/workspace-store.ts` (signals) syncs selected doc + live
+  clause summary from the labeling view to the left list, so its chips update while
+  labeling without refetching; the labeling view now reacts to `paramMap` changes (the
+  shell keeps it mounted across doc switches). Left panel becomes a drawer under `lg:`.
+  Deep-links, filter/group, upload auto-select, and delete-clears-center all verified
+  end-to-end in headless Chrome against the rebuilt containers (16/16 checks + mobile
+  drawer smoke).
 
 **Pending / not started**
 - ⬜ Further component polish (e.g. card shadow) + clause-palette reharmonization vs. orange

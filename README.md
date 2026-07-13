@@ -3,7 +3,8 @@
 A small full-stack app that helps legal teams track **which contracts contain which types
 of clauses**. Users upload contracts (plain text / Markdown), label individual sentences
 with a clause type (e.g. *Limitation of Liability*, *Termination for Convenience*,
-*Non-Compete*), and browse everything from a dashboard with search, filtering and grouping.
+*Non-Compete*), and browse everything from a single workspace with search, filtering and
+grouping.
 
 It's designed so an **automatic labeling** step (a model that proposes clause labels a human
 reviews) drops in later with no schema change.
@@ -34,8 +35,13 @@ Try it with the sample contracts in [`docs/`](docs/) (`01-master-services-agreem
    it into sentences once, on upload.
 2. **Label** clause-bearing sentences: click a sentence → an in-place popover → pick a
    clause type. Labels show as colored highlights; a sidebar lists all clauses in the doc.
-3. **Dashboard**: every document with its clause counts, plus search, filter-by-clause, and
+3. **Browse**: every document with its clause counts, plus search, filter-by-clause, and
    group-by-clause.
+
+Everything happens on **one three-column workspace**: a left panel with the searchable
+document list (search + filter + group + upload), the document/labeling view in the center,
+and the clause palette + per-document summary on the right. Picking a document on the left
+swaps the center — there is no separate landing page, and `/documents/:id` deep-links work.
 
 ---
 
@@ -67,7 +73,7 @@ contract-clause-tracker/
 ├── backend/                # FastAPI service (app/, tests/, Dockerfile, README)
 │   └── app/                #   models, schemas, routers, segmentation, seed
 ├── frontend/               # Angular workspace (Spartan-NG library + the app)
-│   ├── projects/app/       #   ★ the Contract Clause Tracker UI (dashboard + labeling)
+│   ├── projects/app/       #   ★ the Contract Clause Tracker UI (3-column workspace)
 │   ├── libs/ui/            #   57 Spartan-NG components (owned source + Storybook stories)
 │   ├── Dockerfile          #   multi-stage: pnpm build → nginx
 │   └── nginx.conf
@@ -99,9 +105,10 @@ one. Automatic labeling becomes: insert `source='model', status='suggested'` row
 renders them as dashed **suggestions** with **Accept/Reject** (a `PATCH`). Human-in-the-loop
 review is exactly what legal teams need — and it needs no schema change.
 
-**UI: a hybrid labeling screen.** A persistent right sidebar (clause palette + live "clauses
-in this document" summary) combined with an in-place popover on the clicked sentence. See
-`docs/ui-sketches/` for the two options that led here.
+**UI: a single labeling workspace.** A persistent right sidebar (clause palette + live
+"clauses in this document" summary) combined with an in-place popover on the clicked
+sentence; the document list lives in a persistent left panel, so switching documents never
+leaves the page. See `docs/ui-sketches/` for the two options that led here.
 
 **Reused a design system, re-skinned to the brand.** Rather than build components from
 scratch, the app consumes a Spartan-NG library whose entire look is driven by CSS tokens; the
@@ -118,7 +125,7 @@ More detail: [`docs/requirements.md`](docs/requirements.md) and
 | Method | Path | Purpose |
 |---|---|---|
 | `POST` | `/documents` | Upload a `.txt`/`.md` file → stores, segments, returns the document. |
-| `GET` | `/documents` | Dashboard list (per-doc clause summary). Query: `search`, `clause_type`, `status`, `group_by=clause_type`. |
+| `GET` | `/documents` | Document list (per-doc clause summary). Query: `search`, `clause_type`, `status`, `group_by=clause_type`. |
 | `GET` | `/documents/{id}` | Document + sentences (with their annotations). |
 | `DELETE` | `/documents/{id}` | Delete a document (cascades). |
 | `GET` | `/clause-types` | The seeded clause taxonomy. |
@@ -158,7 +165,7 @@ pnpm storybook                                # optional: the design-system play
   round-trips and abbreviation traps), the annotation lifecycle + unique constraint, and the
   dashboard search/filter/group queries.
 - **Frontend** — the app builds clean and was driven end-to-end in headless Chrome
-  (upload → segment → label → persistence → dashboard chips).
+  (upload → segment → label → persistence → document-list chips → delete).
 
 ---
 

@@ -1,11 +1,12 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { toast } from 'ngx-sonner';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmSpinnerImports } from '@spartan-ng/helm/spinner';
 import { ApiService } from '../../core/api.service';
+import { WorkspaceStore } from '../../core/workspace-store';
 import { ClauseType, DocumentListItem } from '../../core/models';
 import { tint } from '../../core/color.util';
 
@@ -16,13 +17,14 @@ interface DocGroup {
 }
 
 @Component({
-  selector: 'app-dashboard',
-  imports: [NgTemplateOutlet, ...HlmButtonImports, ...HlmInputImports, ...HlmSpinnerImports],
-  templateUrl: './dashboard.html',
+  selector: 'app-workspace',
+  imports: [NgTemplateOutlet, RouterOutlet, ...HlmButtonImports, ...HlmInputImports, ...HlmSpinnerImports],
+  templateUrl: './workspace.html',
 })
-export class Dashboard {
+export class Workspace {
   private readonly api = inject(ApiService);
   private readonly router = inject(Router);
+  readonly store = inject(WorkspaceStore);
 
   readonly docs = signal<DocumentListItem[]>([]);
   readonly clauseTypes = signal<ClauseType[]>([]);
@@ -30,6 +32,8 @@ export class Dashboard {
   readonly search = signal('');
   readonly activeClauseFilter = signal<number | null>(null);
   readonly groupBy = signal(false);
+  readonly filterOpen = signal(false);
+  readonly drawerOpen = signal(false);
 
   // upload modal state
   readonly uploadOpen = signal(false);
@@ -40,9 +44,16 @@ export class Dashboard {
 
   private searchTimer: ReturnType<typeof setTimeout> | undefined;
 
+  /** Doc list with the open document's chips kept live from the labeling view. */
+  private readonly liveDocs = computed(() => {
+    const live = this.store.liveSummary();
+    if (!live) return this.docs();
+    return this.docs().map((d) => (d.id === live.docId ? { ...d, clause_summary: live.summary } : d));
+  });
+
   readonly filteredDocs = computed(() => {
     const f = this.activeClauseFilter();
-    const list = this.docs();
+    const list = this.liveDocs();
     if (f == null) return list;
     return list.filter((d) => (d.clause_summary ?? []).some((c) => c.clause_type_id === f));
   });
@@ -59,12 +70,19 @@ export class Dashboard {
     return result;
   });
 
+  readonly activeFilterType = computed<ClauseType | null>(
+    () => this.clauseTypes().find((t) => t.id === this.activeClauseFilter()) ?? null,
+  );
+
   constructor() {
     this.api.listClauseTypes().subscribe({
       next: (t) => this.clauseTypes.set(t),
       error: () => {},
     });
     this.reload();
+    effect(() => {
+      if (this.store.uploadRequests()) this.openUpload();
+    });
   }
 
   reload(): void {
@@ -88,12 +106,9 @@ export class Dashboard {
     this.searchTimer = setTimeout(() => this.reload(), 300);
   }
 
-  toggleClauseFilter(id: number): void {
-    this.activeClauseFilter.update((cur) => (cur === id ? null : id));
-  }
-
-  clearClauseFilter(): void {
-    this.activeClauseFilter.set(null);
+  setFilter(id: number | null): void {
+    this.activeClauseFilter.set(id);
+    this.filterOpen.set(false);
   }
 
   toggleGroupBy(): void {
@@ -101,7 +116,12 @@ export class Dashboard {
   }
 
   open(id: number): void {
+    this.drawerOpen.set(false);
     this.router.navigate(['/documents', id]);
+  }
+
+  isActive(id: number): boolean {
+    return this.store.selectedDocId() === id;
   }
 
   deleteDoc(id: number, ev: Event): void {
@@ -109,6 +129,7 @@ export class Dashboard {
     this.api.deleteDocument(id).subscribe({
       next: () => {
         this.docs.update((list) => list.filter((d) => d.id !== id));
+        if (this.store.selectedDocId() === id) this.router.navigate(['/']);
         toast('Document deleted');
       },
       error: () => toast.error('Delete failed'),
@@ -165,7 +186,17 @@ export class Dashboard {
         clearTimeout(t);
         this.uploading.set(false);
         this.uploadOpen.set(false);
-        toast.success(`"${doc.filename}" uploaded · ${doc.sentences?.length ?? 0} sentences`);
+        this.drawerOpen.set(false);
+        const item: DocumentListItem = {
+          id: doc.id,
+          filename: doc.filename,
+          format: doc.format,
+          created_at: doc.created_at,
+          sentence_count: doc.sentences.length,
+          clause_summary: [],
+        };
+        this.docs.update((list) => [item, ...list]);
+        toast.success(`"${doc.filename}" uploaded · ${doc.sentences.length} sentences`);
         this.router.navigate(['/documents', doc.id]);
       },
       error: (err) => {

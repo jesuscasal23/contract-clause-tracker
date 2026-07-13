@@ -1,0 +1,229 @@
+<div class="min-h-screen bg-background text-foreground">
+  <!-- Top bar -->
+  <header class="sticky top-0 z-30 border-b bg-background/95 backdrop-blur">
+    <div class="flex items-center gap-3 px-4 py-3 sm:px-6">
+      <button hlmBtn variant="ghost" size="sm" class="lg:hidden" (click)="drawerOpen.set(true)" title="Show documents">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg>
+        Documents
+      </button>
+      <div class="text-lg font-semibold tracking-tight">Clause<span class="text-primary">Tracker</span></div>
+      <span class="hidden rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground sm:inline">Contract clause labeling</span>
+    </div>
+  </header>
+
+  <!-- Three-column workspace -->
+  <div class="mx-auto flex max-w-[1600px] items-start gap-6 px-4 py-6 sm:px-6">
+    <!-- LEFT: document list (desktop) -->
+    <aside class="hidden w-80 shrink-0 lg:block">
+      <div class="sticky top-20 flex h-[calc(100vh-6.5rem)] flex-col">
+        <ng-container *ngTemplateOutlet="leftPanel"></ng-container>
+      </div>
+    </aside>
+
+    <!-- CENTER: labeling view or empty state (+ its right sidebar) -->
+    <main class="min-w-0 flex-1">
+      <router-outlet />
+    </main>
+  </div>
+</div>
+
+<!-- LEFT drawer (mobile) -->
+@if (drawerOpen()) {
+  <div class="fixed inset-0 z-40 bg-black/40 lg:hidden" (click)="drawerOpen.set(false)"></div>
+  <div class="fixed inset-y-0 left-0 z-50 w-80 max-w-[85vw] p-3 lg:hidden">
+    <ng-container *ngTemplateOutlet="leftPanel"></ng-container>
+  </div>
+}
+
+<!-- Left panel content (shared by desktop aside + mobile drawer) -->
+<ng-template #leftPanel>
+  <div class="flex h-full min-h-0 flex-col rounded-xl border bg-card">
+    <div class="space-y-2.5 border-b p-3">
+      <div class="flex items-center gap-2">
+        <div class="text-sm font-semibold">Documents</div>
+        <span class="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">{{ docs().length }}</span>
+        <div class="flex-1"></div>
+        <button hlmBtn size="sm" (click)="openUpload()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+          Upload
+        </button>
+      </div>
+
+      <div class="relative">
+        <svg class="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input #si hlmInput class="h-8 w-full pl-8 text-sm" placeholder="Search documents…" [value]="search()" (input)="onSearchInput(si.value)" />
+      </div>
+
+      <!-- Compact filter + group controls -->
+      <div class="flex items-center gap-1.5">
+        <div class="relative min-w-0 flex-1">
+          <button
+            type="button"
+            (click)="filterOpen.set(!filterOpen())"
+            class="flex h-8 w-full items-center gap-1.5 rounded-md border px-2.5 text-xs font-medium transition hover:bg-muted"
+            [class.text-muted-foreground]="!activeFilterType()"
+            title="Filter by clause type"
+          >
+            <svg class="shrink-0" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>
+            @if (activeFilterType(); as t) {
+              <span class="h-2 w-2 shrink-0 rounded-full" [style.background-color]="t.color"></span>
+              <span class="truncate">{{ t.name }}</span>
+            } @else {
+              <span>All clauses</span>
+            }
+            <span class="flex-1"></span>
+            <svg class="shrink-0 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          @if (filterOpen()) {
+            <div class="fixed inset-0 z-40" (click)="filterOpen.set(false)"></div>
+            <div class="absolute left-0 top-9 z-50 w-64 rounded-xl border bg-popover p-1.5 text-popover-foreground shadow-xl">
+              <button
+                type="button"
+                (click)="setFilter(null)"
+                class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm transition hover:bg-muted"
+              >
+                <span class="flex-1 text-left">All clause types</span>
+                @if (activeClauseFilter() === null) {
+                  <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-primary"><path d="M20 6 9 17l-5-5"/></svg>
+                }
+              </button>
+              @for (t of clauseTypes(); track t.id) {
+                <button
+                  type="button"
+                  (click)="setFilter(t.id)"
+                  class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm transition hover:bg-muted"
+                >
+                  <span class="h-3 w-3 shrink-0 rounded-[3px]" [style.background-color]="t.color"></span>
+                  <span class="flex-1 text-left">{{ t.name }}</span>
+                  @if (activeClauseFilter() === t.id) {
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-primary"><path d="M20 6 9 17l-5-5"/></svg>
+                  }
+                </button>
+              }
+            </div>
+          }
+        </div>
+        <button
+          type="button"
+          (click)="toggleGroupBy()"
+          class="flex h-8 shrink-0 items-center gap-1.5 rounded-md border px-2.5 text-xs font-medium transition hover:bg-muted"
+          [class]="groupBy() ? 'border-primary/40 bg-primary/5 text-primary' : 'text-muted-foreground'"
+          title="Group documents by clause type"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg>
+          Group
+        </button>
+      </div>
+    </div>
+
+    <!-- Document list -->
+    <div class="min-h-0 flex-1 overflow-y-auto p-2">
+      @if (loading()) {
+        <div class="flex items-center justify-center py-10"><hlm-spinner /></div>
+      } @else if (docs().length === 0) {
+        <div class="px-3 py-10 text-center">
+          <div class="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-muted text-muted-foreground">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg>
+          </div>
+          <div class="text-sm font-medium">No documents yet</div>
+          <p class="mt-1 text-xs text-muted-foreground">Upload a contract (.txt or .md) to start labeling.</p>
+          <button hlmBtn size="sm" class="mt-4" (click)="openUpload()">Upload your first contract</button>
+        </div>
+      } @else if (filteredDocs().length === 0) {
+        <div class="px-3 py-10 text-center">
+          <div class="text-sm font-medium">No documents match</div>
+          <p class="mt-1 text-xs text-muted-foreground">Try a different search or clause filter.</p>
+          @if (activeClauseFilter() !== null) {
+            <button type="button" class="mt-2 text-xs text-muted-foreground underline underline-offset-2" (click)="setFilter(null)">Clear filter</button>
+          }
+        </div>
+      } @else if (groupBy()) {
+        @for (g of groups(); track g.label) {
+          <div class="mb-1 mt-3 flex items-center gap-1.5 px-2 first:mt-1">
+            @if (g.type) {
+              <span class="h-2 w-2 rounded-full" [style.background-color]="g.type.color"></span>
+            }
+            <span class="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">{{ g.label }}</span>
+            <span class="text-[11px] text-muted-foreground">{{ g.docs.length }}</span>
+          </div>
+          @for (d of g.docs; track d.id) {
+            <ng-container *ngTemplateOutlet="docRow; context: { $implicit: d }"></ng-container>
+          }
+        }
+      } @else {
+        @for (d of filteredDocs(); track d.id) {
+          <ng-container *ngTemplateOutlet="docRow; context: { $implicit: d }"></ng-container>
+        }
+      }
+    </div>
+  </div>
+</ng-template>
+
+<!-- Compact document row -->
+<ng-template #docRow let-d>
+  <div
+    (click)="open(d.id)"
+    class="group relative mb-1 cursor-pointer rounded-lg border px-3 py-2 transition"
+    [class]="isActive(d.id) ? 'border-primary/40 bg-primary/5' : 'border-transparent hover:bg-muted'"
+  >
+    <div class="flex items-start justify-between gap-2">
+      <div class="min-w-0">
+        <div class="truncate text-sm font-medium">{{ d.filename }}</div>
+        <div class="mt-0.5 text-[11px] text-muted-foreground">{{ formatDate(d.created_at) }} · {{ d.sentence_count }} sentences</div>
+      </div>
+      <button
+        type="button"
+        (click)="deleteDoc(d.id, $event)"
+        class="shrink-0 rounded-md p-1 text-muted-foreground opacity-0 transition hover:bg-muted hover:text-destructive group-hover:opacity-100"
+        title="Delete document"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+    <div class="mt-1.5 flex flex-wrap gap-1">
+      @for (c of d.clause_summary; track c.clause_type_id) {
+        <span class="rounded-full px-1.5 py-px text-[10px] font-medium" [style]="chipStyle(c.color)">{{ c.name }} · {{ c.count }}</span>
+      } @empty {
+        <span class="text-[10px] text-muted-foreground">Not labeled yet</span>
+      }
+    </div>
+  </div>
+</ng-template>
+
+<!-- Upload modal -->
+@if (uploadOpen()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/40" (click)="closeUpload()"></div>
+    <div class="relative w-full max-w-md rounded-xl border bg-card p-6 shadow-xl">
+      <h2 class="text-lg font-semibold">Upload contract</h2>
+      <p class="mt-1 text-sm text-muted-foreground">Plain text or Markdown (.txt, .md).</p>
+
+      @if (uploading()) {
+        <div class="mt-6 flex flex-col items-center gap-3 py-10">
+          <hlm-spinner />
+          <div class="text-sm text-muted-foreground">{{ uploadPhase() }}</div>
+        </div>
+      } @else {
+        <label
+          (drop)="onDrop($event)"
+          (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave($event)"
+          class="mt-5 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed px-6 py-10 text-center transition"
+          [class.border-primary]="dragging()"
+          [class.bg-muted]="dragging()"
+        >
+          <svg class="text-muted-foreground" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
+          <div class="text-sm"><span class="font-medium text-primary">Click to choose</span> or drag &amp; drop</div>
+          <div class="text-xs text-muted-foreground">.txt or .md</div>
+          <input type="file" accept=".txt,.md,text/plain,text/markdown" class="hidden" (change)="onFileInput($event)" />
+        </label>
+        @if (uploadError()) {
+          <div class="mt-3 rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">{{ uploadError() }}</div>
+        }
+        <div class="mt-5 flex justify-end gap-2">
+          <button hlmBtn variant="ghost" (click)="closeUpload()">Cancel</button>
+        </div>
+      }
+    </div>
+  </div>
+}
