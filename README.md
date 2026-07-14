@@ -20,8 +20,9 @@ docker compose up --build
 - **App** → http://localhost:4200
 - **API docs** (Swagger) → http://localhost:8000/docs
 
-> Ports **4200** and **8000** must be free. `docker compose up` starts the Angular frontend
-> (nginx) and the FastAPI backend; the browser loads the app from `:4200` and calls the API
+> Ports **4200**, **8000** and **5433** must be free. `docker compose up` starts three
+> containers: PostgreSQL (published on host `:5433`), the FastAPI backend on `:8000`, and the
+> Angular frontend (nginx) on `:4200`. The browser loads the app from `:4200` and calls the API
 > at `:8000` (the backend's CORS allow-list already includes `http://localhost:4200`).
 
 A fresh database is seeded with one sample contract so the app never starts empty. Try the
@@ -65,7 +66,7 @@ empty screen.
   `Section 3.2`). Minimal by design.
 - **Frontend** — **Angular 21** (standalone, **zoneless**, signals) built on a **Spartan-NG**
   component library (the Angular port of shadcn/ui), **re-skinned to the Legartis brand** via
-  CSS design tokens. The workspace also ships a **Storybook** design-system playground.
+  CSS design tokens. The workspace also ships a **Storybook** design-system workbench (hosted by `frontend/projects/storybook-host`).
 
 ---
 
@@ -132,6 +133,7 @@ More detail: [`docs/requirements.md`](docs/requirements.md) and
 | `GET` | `/documents/{id}` | Document + sentences (with their annotations). |
 | `DELETE` | `/documents/{id}` | Delete a document (cascades). |
 | `GET` | `/clause-types` | The seeded clause taxonomy. |
+| `POST` | `/clause-types` | Add a clause type (name + hex color). |
 | `POST` | `/annotations` | Create a label `{sentence_id, clause_type_id}`. |
 | `PATCH` | `/annotations/{id}` | Change type / accept / reject (`status`). |
 | `DELETE` | `/annotations/{id}` | Remove a label. |
@@ -143,12 +145,14 @@ Interactive docs at `/docs` when the backend is running.
 
 ## Local development (without Docker)
 
-**Backend**
+**Backend** (needs the compose PostgreSQL on `:5433` — the one Docker dependency)
 ```bash
+docker compose up -d db                       # start PostgreSQL (from the repo root)
+
 cd backend
-python -m venv .venv && .venv/bin/pip install -r requirements.txt
+python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 .venv/bin/uvicorn app.main:app --reload      # http://localhost:8000
-.venv/bin/python -m pytest                    # tests
+.venv/bin/python -m pytest                    # tests (in-memory SQLite — no server needed)
 ```
 
 **Frontend**
@@ -157,7 +161,7 @@ cd frontend
 pnpm install
 pnpm ng serve app                             # http://localhost:4200 (needs the backend on :8000)
 pnpm ng build app                             # production build
-pnpm storybook                                # optional: the design-system playground
+pnpm storybook                                # optional: the Storybook design-system workbench
 ```
 
 ---

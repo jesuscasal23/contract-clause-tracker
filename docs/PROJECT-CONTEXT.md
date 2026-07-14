@@ -36,7 +36,7 @@ automatic labeling step** — so every decision is made to make that step drop i
 | What | Path |
 |---|---|
 | **Docs & specs** (this file, requirements, sketches, example contracts) | `~/Desktop/contract-clause-tracker/docs/` |
-| **Angular design library** (Spartan-NG, being re-skinned to Legartis brand) | `~/legartis-ui/` |
+| **Angular design library** (Spartan-NG, re-skinned to Legartis brand) | `contract-clause-tracker/frontend/libs/ui/` (originally developed at `~/legartis-ui`, since vendored in) |
 | Backend app (FastAPI) | `~/Desktop/contract-clause-tracker/backend/` (**done** — see §6) |
 | Frontend app that consumes the library | `contract-clause-tracker/frontend/projects/app/` (consolidated; `~/legartis-ui` kept intact as the original library) |
 
@@ -52,10 +52,11 @@ automatic labeling step** — so every decision is made to make that step drop i
     ├── option-a-two-pane.html             ← interactive sketch: two-pane layout
     └── option-b-inline-popover.html       ← interactive sketch: focused reading + popover
 
-~/legartis-ui/                             ← Spartan-NG library (Angular 21, Tailwind v4, ~58 components)
-├── projects/playground/src/styles.css     ← ★ design tokens; RE-SKINNED to Legartis brand (see §5)
-├── libs/ui/<component>/src/lib/*.stories.ts ← 58 components, each with a Storybook story
-└── projects/playground/.storybook/        ← Storybook config
+~/Desktop/contract-clause-tracker/frontend/ ← Spartan-NG library workspace (Angular 21, Tailwind v4, 57 components)
+├── libs/ui/theme.css                      ← ★ design tokens; RE-SKINNED to Legartis brand (see §5)
+├── libs/ui/<component>/src/lib/*.stories.ts ← 57 components, each with a Storybook story
+├── projects/app/                          ← the Contract Clause Tracker UI
+└── projects/storybook-host/.storybook/   ← Storybook config
 ```
 The example contracts intentionally embed the target clause types among filler sentences
 and include segmentation traps (`Inc.`, `LLC`, `e.g.`, `99.9%`, `$185,000`, `Section 3.2`)
@@ -110,7 +111,7 @@ to stress the sentence splitter.
 
 ## 5. Legartis brand tokens (exact, extracted from live legartis.ai Webflow CSS)
 
-Applied to `~/legartis-ui/projects/playground/src/styles.css` (the `:root` light block).
+Applied to `libs/ui/theme.css` (the `:root` light block), shared by the app and the Storybook host.
 
 | Token | Value | Meaning |
 |---|---|---|
@@ -139,23 +140,25 @@ button `.375rem`, card/input `.5rem`, pills fully rounded.
 - ✅ `requirements.md` written (overview → data model → API → UI → theming → extensions).
 - ✅ Three example contracts created.
 - ✅ Two interactive UI sketches created; hybrid direction chosen.
-- ✅ Design library located (`~/legartis-ui`) and **re-skinned to Legartis brand** in
-  `styles.css` (primary orange, neutrals, radius, Geist font, orange focus ring). Lucide
+- ✅ Design library located (`~/legartis-ui`, since vendored into `frontend/`) and
+  **re-skinned to Legartis brand** in what is now `libs/ui/theme.css` (primary orange,
+  neutrals, radius, Geist font, orange focus ring). Lucide
   kept, dark mode untouched, exact hex used.
-- ✅ **Backend built** at `contract-clause-tracker/backend/` (FastAPI + SQLModel + SQLite,
-  per §6/§7 of `requirements.md` — no spec deviations). Sentences segmented once at upload
+- ✅ **Backend built** at `contract-clause-tracker/backend/` (FastAPI + SQLModel +
+  PostgreSQL, per §6/§7 of `requirements.md`). Sentences segmented once at upload
   with `pysbd` (per-line blocks; markdown headings kept whole; emphasis markers removed
   via an offset map so `Inc.**` doesn't split); every stored offset verified to slice back
   out of the verbatim `raw_text`. All §7 endpoints incl. `?search/clause_type/status/
   group_by=clause_type`; `POST /documents/{id}/auto-label` scaffolded as a documented 501
   stub for the pair session. Seeded 7 clause types (ink hex in `clause_types.color`;
   frontend derives the tint). Dashboard summaries exclude `rejected` annotations unless
-  `?status=rejected`. 22 pytest tests green (upload/segmentation traps, annotation
-  lifecycle + unique constraint, dashboard queries, cascade delete); verified end-to-end
-  with curl. `backend/Dockerfile` + root `docker-compose.yml` (backend on :8000, named
-  volume for SQLite; frontend service slot noted). See `backend/README.md`.
-- ✅ **Frontend built & verified** as a new `app` project inside the `~/legartis-ui`
-  Angular workspace (`projects/app/`, added to `angular.json` alongside `playground`;
+  `?status=rejected`. 25 pytest tests green (upload/segmentation traps, annotation
+  lifecycle + unique constraint, dashboard queries, cascade delete, seed idempotency);
+  verified end-to-end with curl. `backend/Dockerfile` + root `docker-compose.yml`
+  (PostgreSQL `db` service on host :5433 with a named data volume, backend on :8000,
+  frontend on :4200). See `backend/README.md`.
+- ✅ **Frontend built & verified** as a new `app` project inside the `frontend/`
+  Angular workspace (`projects/app/`, added to `angular.json` alongside `storybook-host`, the Storybook host app;
   reuses `libs/ui` Spartan components + the re-skinned tokens). Angular 21 standalone +
   **zoneless** (workspace has no zone.js) + signals. Three screens: dashboard
   (search/filter-by-clause/group-by, client-side over the list; upload modal with the
@@ -234,24 +237,25 @@ button `.375rem`, card/input `.5rem`, pills fully rounded.
 
 ## 7. How to run / verify
 
-- **Storybook (design library)**: from `~/legartis-ui`, `pnpm install` then
-  `pnpm storybook` (script: `ng run playground:storybook`). Uses **pnpm** (see
+- **Everything at once**: `docker compose up --build` from the repo root → app on
+  `http://localhost:4200`, API docs on `http://localhost:8000/docs`, PostgreSQL on `:5433`.
+- **Storybook (design library)**: from `frontend/`, `pnpm install` then
+  `pnpm storybook` (script: `ng run storybook-host:storybook`). Uses **pnpm** (see
   `packageManager`). This is how to eyeball the Legartis re-skin across all components.
 - **Sketches**: open the `.html` files in `docs/ui-sketches/` directly in a browser.
-- **Backend**: `cd backend && .venv/bin/uvicorn app.main:app --reload` (or
-  `docker-compose up` from the repo root); docs at `http://localhost:8000/docs`;
-  tests via `.venv/bin/python -m pytest`.
-- **Frontend**: from `~/legartis-ui`, `pnpm install` then `pnpm ng serve app` → serves the
+- **Backend**: start PostgreSQL first (`docker compose up -d db` from the repo root), then
+  `cd backend && .venv/bin/uvicorn app.main:app --reload`; docs at
+  `http://localhost:8000/docs`; tests via `.venv/bin/python -m pytest` (in-memory SQLite,
+  no server needed).
+- **Frontend**: from `frontend/`, `pnpm install` then `pnpm ng serve app` → serves the
   Contract Clause Tracker at `http://localhost:4200` (it calls the backend at `:8000`; the
-  backend CORS already allows `:4200`). Run the backend first. NOTE: an unrelated
-  `todo-app` may already be squatting `:8000`/`:4200` — stop it first, or the app won't
-  reach its API. Build check: `pnpm ng build app`.
+  backend CORS already allows `:4200`). Run the backend first. Build check:
+  `pnpm ng build app`.
 
 **Gotchas**
-- Library is at `~/legartis-ui`, **not** on the Desktop. The old `~/Desktop/todo-app/
-  todo-frontend` is an unrelated bare Angular scaffold — ignore it.
-- Tailwind v4 + Spartan-NG: components read the CSS variables in `styles.css`; changing a
-  token re-skins everything. `@source "../../../libs/ui"` registers the component classes.
+- Tailwind v4 + Spartan-NG: components read the CSS variables in `libs/ui/theme.css`
+  (the single source of truth, imported by each project's `styles.css`); changing a token
+  re-skins everything. `@source "../../../libs/ui"` registers the component classes.
 - Keep brand values as exact hex per the decision.
 
 ---
@@ -271,7 +275,9 @@ nearest clause type, or a classifier trained on accumulated confirmed labels. Se
 ## 9. TL;DR for a new agent
 
 Read `requirements.md`, open the two sketches, then continue from §6 "Pending". The
-concept, data model, API, UI, and brand theming are all decided and documented; the
-remaining work is **building** the backend, the frontend app (on top of the re-skinned
-`~/legartis-ui` library), Docker, tests, and README — for a Legartis interview case study
-whose graded centerpiece is an intuitive sentence-labeling UX.
+concept, data model, API, UI, and brand theming are all decided and documented — and the
+build is **done**: backend (FastAPI + SQLModel + PostgreSQL), the Angular app in the
+`frontend/` workspace, Docker (three-service compose), tests, and README are in place and
+verified end-to-end. What remains is polish (§6 "Pending") and the pair-programming
+automatic-labeling session (§8) — for a Legartis interview case study whose graded
+centerpiece is an intuitive sentence-labeling UX.

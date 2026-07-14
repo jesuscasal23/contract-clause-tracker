@@ -160,7 +160,7 @@ requirement for free (multi-/sub-sentence) spans is a constraint relaxation + me
 migration, not a rewrite. In effect, our annotation is a *constrained special case* of a
 general offset-span annotation: "must align to a sentence boundary."
 
-### 6.1 Schema (SQLite for the MVP; portable to PostgreSQL)
+### 6.1 Schema (PostgreSQL; dialect-portable — tests run on in-memory SQLite)
 
 ```sql
 CREATE TABLE documents (
@@ -269,8 +269,9 @@ confirmed labels.
 
 - **Backend**: Python + FastAPI. Keep it minimal (the brief asks for minimal backend code).
 - **Frontend**: Angular.
-- **Database**: SQLite for the MVP (single file, zero-config); schema is Postgres-portable.
-- **Containerization**: `Dockerfile` per service + `docker-compose.yml` → `docker-compose up`.
+- **Database**: PostgreSQL (compose `db` service, published on host `:5433`); the schema is
+  dialect-portable — tests run on in-memory SQLite so they need no server.
+- **Containerization**: `Dockerfile` per service + `docker-compose.yml` → `docker compose up`.
 - **Tests**: cover the critical paths — upload+segmentation, create/delete annotation,
   dashboard filter/group queries.
 
@@ -287,13 +288,13 @@ confirmed labels.
 - Automatic labeling (Section 8) and active-learning from confirmed labels.
 - Multi-user, roles, and audit trail (who labeled what, when).
 - Export (CSV/JSON) of clauses for downstream review.
-- Scale: move to PostgreSQL, full-text search index, background segmentation for large docs.
+- Scale: full-text search index, background segmentation for large docs, dashboard pagination.
 
 ## 12. Theming — Legartis brand (applied)
 
-The Angular UI is built on the **`legartis-ui`** Spartan-NG component library (at
-`~/legartis-ui`, Angular 21 + Tailwind v4, ~58 components). Theming is centralized in
-`projects/playground/src/styles.css` via shadcn-style CSS variables. The values below were
+The Angular UI is built on the **`legartis-ui`** Spartan-NG component library (vendored in
+`frontend/`, Angular 21 + Tailwind v4, 57 components). Theming is centralized in
+`libs/ui/theme.css` via shadcn-style CSS variables. The values below were
 extracted from the live legartis.ai Webflow site and have been applied:
 
 - **Primary / brand**: `#fa5b05` (orange); focus `--ring` also orange.
