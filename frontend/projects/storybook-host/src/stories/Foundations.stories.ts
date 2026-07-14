@@ -2,8 +2,8 @@ import type { Meta, StoryObj } from '@storybook/angular';
 
 /**
  * The design system is themed entirely through CSS variables declared in
- * `projects/playground/src/styles.css`. Change a single variable — e.g. `--primary` —
- * and every component that references it updates automatically.
+ * `libs/ui/theme.css` (shared by the app and this Storybook host). Change a single
+ * variable — e.g. `--primary` — and every component that references it updates automatically.
  *
  * Use the Theme toolbar (top) to toggle light / dark.
  */

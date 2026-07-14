@@ -8,72 +8,27 @@
   </div>
 } @else {
   <div class="flex items-start gap-6">
-    <!-- Document panel -->
+    <!-- CENTER: the document reading pane -->
     <div class="min-w-0 flex-1">
-      <div class="mx-auto max-w-3xl rounded-xl border bg-card p-6 sm:p-8">
-        <h1 class="mb-1 text-xl font-semibold tracking-tight">{{ titleize(doc()!.filename) }}</h1>
-        <div class="mb-6 text-xs text-muted-foreground">
-          {{ doc()!.sentences.length }} sentences · {{ totalLabeled() }} labeled · click a sentence to label it
-        </div>
-        <div class="doc-body">
-          @for (v of viewSentences(); track v.s.id) {
-            @if (v.heading) {
-              <div class="mb-2 mt-6 text-sm font-semibold uppercase tracking-wide text-muted-foreground first:mt-0">{{ displayHeading(v.s.text) }}</div>
-            } @else {
-              <span
-                [id]="'s-' + v.s.id"
-                class="s"
-                [class.selected]="selectedSentenceId() === v.s.id"
-                [class.flash]="flashId() === v.s.id"
-                [style]="sentenceStyle(v)"
-                (click)="clickSentence(v, $event)"
-                >{{ v.s.text }}</span
-              >@if (v.type) {<span class="tag" [style]="tagStyle(v.type.color)">{{ v.type.name }}</span>}
-              <span> </span>
-            }
-          }
-        </div>
-      </div>
+      <app-document-view
+        [doc]="doc()!"
+        [sentences]="viewSentences()"
+        [totalLabeled]="totalLabeled()"
+        [selectedId]="selectedSentenceId()"
+        [flashId]="flashId()"
+        (sentenceClick)="onSentenceClick($event)"
+      />
     </div>
 
     <!-- RIGHT: clause palette + per-document summary -->
     <aside class="hidden w-80 shrink-0 xl:block">
       <div class="sticky top-20 space-y-4">
-          <div class="rounded-xl border bg-card p-4">
-            <div class="mb-3 text-sm font-semibold">Clause types</div>
-            <div class="space-y-1.5">
-              @for (t of clauseTypes(); track t.id) {
-                <div class="flex items-center gap-2 text-sm">
-                  <span class="h-3 w-3 rounded-[3px]" [style.background-color]="t.color"></span>
-                  <span class="text-muted-foreground">{{ t.name }}</span>
-                </div>
-              }
-            </div>
-          </div>
-
-          <div class="rounded-xl border bg-card p-4">
-            <div class="mb-3 flex items-center justify-between">
-              <div class="text-sm font-semibold">Clauses in this document</div>
-              <span class="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">{{ totalLabeled() }}</span>
-            </div>
-            @if (summary().length) {
-              <div class="space-y-1">
-                @for (row of summary(); track row.type.id) {
-                  <button
-                    type="button"
-                    (click)="scrollToType(row.type)"
-                    class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left transition hover:bg-muted"
-                  >
-                    <span class="h-2.5 w-2.5 rounded-[3px]" [style.background-color]="row.type.color"></span>
-                    <span class="flex-1 text-sm">{{ row.type.name }}</span>
-                    <span class="text-xs font-semibold text-muted-foreground">{{ row.count }}</span>
-                  </button>
-                }
-              </div>
-            } @else {
-              <div class="text-sm text-muted-foreground">No clauses marked yet. Click a sentence to label it.</div>
-            }
-        </div>
+        <app-labeling-sidebar
+          [clauseTypes]="clauseTypes()"
+          [summary]="summary()"
+          [totalLabeled]="totalLabeled()"
+          (scrollTo)="scrollToType($event)"
+        />
       </div>
     </aside>
   </div>
@@ -81,46 +36,15 @@
 
 <!-- In-place labeling popover -->
 @if (selectedSentenceId() !== null) {
-  <div class="fixed inset-0 z-40" (click)="closePopover()"></div>
-  <div
-    class="fixed z-50 w-72 rounded-xl border bg-popover p-1.5 text-popover-foreground shadow-xl"
-    [style.top.px]="popoverTop()"
-    [style.left.px]="popoverLeft()"
-  >
-    <div class="px-2 py-1.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-      {{ selectedAnn() ? 'Change clause type' : 'Label this sentence as…' }}
-    </div>
-
-    @if (selectedAnn()?.status === 'suggested') {
-      <div class="mb-1 flex gap-1 px-1">
-        <button hlmBtn size="sm" class="flex-1" (click)="accept(selectedAnn()!)">Accept</button>
-        <button hlmBtn size="sm" variant="outline" class="flex-1" (click)="reject(selectedAnn()!)">Reject</button>
-      </div>
-    }
-
-    @for (t of clauseTypes(); track t.id) {
-      <button
-        type="button"
-        (click)="applyType(t.id)"
-        class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm transition hover:bg-muted"
-      >
-        <span class="h-3 w-3 rounded-[3px]" [style.background-color]="t.color"></span>
-        <span class="flex-1 text-left">{{ t.name }}</span>
-        @if (selectedAnn()?.clause_type_id === t.id) {
-          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-primary"><path d="M20 6 9 17l-5-5"/></svg>
-        }
-      </button>
-    }
-
-    @if (selectedAnn()) {
-      <button
-        type="button"
-        (click)="removeLabel()"
-        class="mt-1 flex w-full items-center gap-2 rounded-md border-t px-2 py-2 text-sm text-destructive transition hover:bg-muted"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-        Remove label
-      </button>
-    }
-  </div>
+  <app-clause-popover
+    [top]="popoverTop()"
+    [left]="popoverLeft()"
+    [clauseTypes]="clauseTypes()"
+    [annotation]="selectedAnn()"
+    (typeSelect)="applyType($event)"
+    (acceptSuggestion)="accept()"
+    (rejectSuggestion)="reject()"
+    (removeLabel)="removeLabel()"
+    (dismiss)="closePopover()"
+  />
 }

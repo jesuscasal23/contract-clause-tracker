@@ -8,8 +8,8 @@ work in this repo. Keep it accurate when you change conventions.
   **owned by this repo** (edit it directly — do not treat it as a black-box dependency).
 - Accessible behavior comes from `@spartan-ng/brain` (Angular CDK under the hood). Do not reimplement it.
 - Styling is **Tailwind CSS v4** utilities + **semantic CSS variables**.
-- **`llms.txt`** at the repo root is the machine-readable catalog of all 57 components (alias, import
-  bundle, selectors). Read it before using or adding components.
+- **`llms.txt`** at the frontend root (`frontend/llms.txt`) is the machine-readable catalog of all 57
+  components (alias, import bundle, selectors). Read it before using or adding components.
 
 ## Project layout
 ```
@@ -17,8 +17,11 @@ libs/ui/<name>/src/
   index.ts                 # public exports + `Hlm<Name>Imports` bundle
   lib/*.ts                 # component/directive source (you own this)
   lib/<name>.stories.ts    # Storybook story (co-located)
-projects/playground/       # host app + Storybook (build target for Storybook)
-  src/styles.css           # Tailwind entry + ALL theme variables
+libs/ui/theme.css          # ALL theme variables (single source of truth, shared by both apps)
+projects/app/              # the Contract Clause Tracker app (the real product)
+  src/styles.css           # Tailwind entry; imports libs/ui/theme.css + app-only hero gradient
+projects/storybook-host/   # Storybook host app (exists only to mount Storybook — never shipped)
+  src/styles.css           # Tailwind entry; imports libs/ui/theme.css
   .storybook/              # Storybook config
 components.json            # spartan CLI config (componentsPath=libs/ui, importAlias=@spartan-ng/helm)
 ```
@@ -34,16 +37,18 @@ components.json            # spartan CLI config (componentsPath=libs/ui, importA
 - It writes to `libs/ui/<name>/` and registers the tsconfig path alias automatically.
 
 ## Theming — the one rule that matters
-- **All colors are CSS variables in `projects/playground/src/styles.css`** (`:root` and `:root.dark`).
-- To rebrand, change `--primary` / `--primary-foreground` (OKLCH). Everything using `bg-primary` /
+- **All colors are CSS variables in `libs/ui/theme.css`** (`:root` and `:root.dark`). Both Tailwind
+  entry files (`projects/app/src/styles.css`, `projects/storybook-host/src/styles.css`) import it —
+  edit the theme ONLY in `libs/ui/theme.css`, never in the entry files.
+- To rebrand, change `--primary` / `--primary-foreground`. Everything using `bg-primary` /
   `text-primary` follows.
 - **Never hardcode hex/rgb colors in components.** Use the semantic tokens: `bg-background`,
   `text-foreground`, `bg-primary`, `bg-muted`, `text-muted-foreground`, `border`, `bg-destructive`, etc.
-- Tailwind must see `libs/ui` — that's why `styles.css` has `@source "../../../libs/ui";`. Keep it.
+- Tailwind must see `libs/ui` — that's why both entry files have `@source "../../../libs/ui";`. Keep it.
 
 ## Storybook
 - Stories are co-located at `libs/ui/<name>/src/lib/<name>.stories.ts` (also picked up from
-  `projects/playground/src`). Titles: `Components/<Name>` or `Foundations/<Name>`.
+  `projects/storybook-host/src`). Titles: `Components/<Name>` or `Foundations/<Name>`.
 - Pattern: `moduleMetadata({ imports: [...Hlm<Name>Imports] })` + a `render` returning `{ template }`.
 - Run `pnpm storybook`; build `pnpm build-storybook`. The theme toolbar toggles light/dark.
 

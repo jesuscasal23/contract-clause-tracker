@@ -1,0 +1,24 @@
+<div class="mx-auto max-w-3xl rounded-xl border bg-card p-6 sm:p-8">
+  <h1 class="mb-1 text-xl font-semibold tracking-tight">{{ titleize(doc().filename) }}</h1>
+  <div class="mb-6 text-xs text-muted-foreground">
+    {{ doc().sentences.length }} sentences · {{ totalLabeled() }} labeled · click a sentence to label it
+  </div>
+  <div class="doc-body">
+    @for (v of sentences(); track v.s.id) {
+      @if (v.heading) {
+        <div class="mb-2 mt-6 text-sm font-semibold uppercase tracking-wide text-muted-foreground first:mt-0">{{ displayHeading(v.s.text) }}</div>
+      } @else {
+        <span
+          [id]="'s-' + v.s.id"
+          class="s"
+          [class.selected]="selectedId() === v.s.id"
+          [class.flash]="flashId() === v.s.id"
+          [style]="sentenceStyle(v)"
+          (click)="onSentenceClick(v, $event)"
+          >{{ v.s.text }}</span
+        >@if (v.type) {<span class="tag" [style]="tagStyle(v.type.color)">{{ v.type.name }}</span>}
+        <span> </span>
+      }
+    }
+  </div>
+</div>

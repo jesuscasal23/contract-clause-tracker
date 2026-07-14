@@ -1,0 +1,55 @@
+@if (open()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/40" (click)="close()"></div>
+    <div class="relative w-full max-w-md rounded-xl border bg-card p-6 shadow-xl">
+      @if (status() === 'idle') {
+        <button
+          type="button"
+          (click)="close()"
+          class="absolute right-4 top-4 rounded-md p-1 text-muted-foreground transition hover:bg-muted hover:text-foreground"
+          title="Close"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      }
+      <h2 class="text-lg font-semibold">Upload contract</h2>
+      <p class="mt-1 text-sm text-muted-foreground">Plain text or Markdown (.txt, .md).</p>
+
+      @switch (status()) {
+        @case ('busy') {
+          <div class="mt-6 flex flex-col items-center gap-3 py-10">
+            <hlm-spinner class="text-2xl text-primary" />
+            <div class="text-sm text-muted-foreground">{{ phase() }}</div>
+          </div>
+        }
+        @case ('done') {
+          <div class="mt-6 flex flex-col items-center gap-3 py-10">
+            <svg class="checkmark" viewBox="0 0 52 52" aria-hidden="true">
+              <circle class="checkmark-circle" cx="26" cy="26" r="24" />
+              <path class="checkmark-check" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+            </svg>
+            <div class="text-sm font-medium">Upload complete</div>
+          </div>
+        }
+        @default {
+          <label
+            (drop)="onDrop($event)"
+            (dragover)="onDragOver($event)"
+            (dragleave)="onDragLeave($event)"
+            class="mt-5 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed px-6 py-10 text-center transition"
+            [class.border-primary]="dragging()"
+            [class.bg-muted]="dragging()"
+          >
+            <svg class="text-muted-foreground" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
+            <div class="text-sm"><span class="font-medium text-primary">Click to choose</span> or drag &amp; drop</div>
+            <div class="text-xs text-muted-foreground">.txt or .md</div>
+            <input type="file" accept=".txt,.md,text/plain,text/markdown" class="hidden" (change)="onFileInput($event)" />
+          </label>
+          @if (error()) {
+            <div class="mt-3 rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">{{ error() }}</div>
+          }
+        }
+      }
+    </div>
+  </div>
+}

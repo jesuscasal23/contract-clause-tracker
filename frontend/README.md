@@ -1,59 +1,30 @@
-# LegartisUi
+# frontend — Angular workspace
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.19.
+Two projects share this workspace and the `libs/ui` Spartan-NG component library:
 
-## Development server
+- **`projects/app`** — the Contract Clause Tracker UI (what `docker compose up` serves
+  on `:4200` via nginx).
+- **`projects/storybook-host`** — a host app that exists only to mount Storybook for the
+  component library; it is never shipped.
 
-To start a local development server, run:
+The workspace uses **pnpm** (see `packageManager` in `package.json`).
 
-```bash
-ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Commands
 
 ```bash
-ng generate component component-name
+pnpm install
+pnpm ng serve app        # dev server → http://localhost:4200 (expects the API on :8000)
+pnpm ng build app        # production build → dist/app
+pnpm storybook           # component workbench → http://localhost:6006
+pnpm build-storybook     # static Storybook build (the library's verify step)
+pnpm ui <name>           # add a spartan/ui component into libs/ui/<name>
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Layout & conventions
 
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- Component source is **owned** in `libs/ui/<name>/` (shadcn-style) — edit it directly;
+  Storybook stories are co-located with each component.
+- All theme tokens live in `libs/ui/theme.css` — the single source of truth, imported by
+  both projects' `styles.css`. Never hardcode colors in components.
+- `AGENTS.md` has the full conventions; `llms.txt` is the machine-readable catalog of all
+  57 components (import alias, directive bundle, selectors).

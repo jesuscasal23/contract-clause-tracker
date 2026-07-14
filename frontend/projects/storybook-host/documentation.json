@@ -9,8 +9,8 @@
     "components": [
         {
             "name": "App",
-            "id": "component-App-da8f300106111034b13fdac219a17cd6c3b601ae0ddb857e3c6df3e9f948194217dbc1fa2cfb22d9521ed87133fed28889e8c2b0f8b02a248d471adb1b53ba10",
-            "file": "projects/playground/src/app/app.ts",
+            "id": "component-App-a04f8514a8c104867877b4491c310f3bd7a229699853d0c74bce96b9ccc6bbc7f36d01ee80cb9004fe7b5eab15e2dfcbe64c82166a845dfe9dbb7111aa0cc881",
+            "file": "projects/storybook-host/src/app/app.ts",
             "encapsulation": [],
             "entryComponents": [],
             "inputs": [],
@@ -33,7 +33,7 @@
                 {
                     "name": "title",
                     "coverageIgnore": false,
-                    "defaultValue": "signal('playground')",
+                    "defaultValue": "signal('storybook-host')",
                     "deprecated": false,
                     "deprecationMessage": "",
                     "type": "unknown",
@@ -59,7 +59,7 @@
             "description": "",
             "rawdescription": "\n",
             "type": "component",
-            "sourceCode": "import { Component, signal } from '@angular/core';\n\n@Component({\n  selector: 'app-root',\n  imports: [],\n  templateUrl: './app.html',\n  styleUrl: './app.css',\n})\nexport class App {\n  protected readonly title = signal('playground');\n}\n",
+            "sourceCode": "import { Component, signal } from '@angular/core';\n\n@Component({\n  selector: 'app-root',\n  imports: [],\n  templateUrl: './app.html',\n  styleUrl: './app.css',\n})\nexport class App {\n  protected readonly title = signal('storybook-host');\n}\n",
             "styleUrl": "./app.css",
             "assetsDirs": [],
             "styleUrlsData": [
@@ -84,7 +84,7 @@
                 "name": "appConfig",
                 "ctype": "miscellaneous",
                 "subtype": "variable",
-                "file": "projects/playground/src/app/app.config.ts",
+                "file": "projects/storybook-host/src/app/app.config.ts",
                 "coverageIgnore": false,
                 "deprecated": false,
                 "deprecationMessage": "",
@@ -96,12 +96,12 @@
         "typealiases": [],
         "enumerations": [],
         "groupedVariables": {
-            "projects/playground/src/app/app.config.ts": [
+            "projects/storybook-host/src/app/app.config.ts": [
                 {
                     "name": "appConfig",
                     "ctype": "miscellaneous",
                     "subtype": "variable",
-                    "file": "projects/playground/src/app/app.config.ts",
+                    "file": "projects/storybook-host/src/app/app.config.ts",
                     "coverageIgnore": false,
                     "deprecated": false,
                     "deprecationMessage": "",
@@ -124,7 +124,7 @@
         "status": "low",
         "files": [
             {
-                "filePath": "projects/playground/src/app/app.config.ts",
+                "filePath": "projects/storybook-host/src/app/app.config.ts",
                 "type": "variable",
                 "linktype": "miscellaneous",
                 "linksubtype": "variable",
@@ -134,7 +134,7 @@
                 "status": "low"
             },
             {
-                "filePath": "projects/playground/src/app/app.ts",
+                "filePath": "projects/storybook-host/src/app/app.ts",
                 "type": "component",
                 "linktype": "component",
                 "name": "App",

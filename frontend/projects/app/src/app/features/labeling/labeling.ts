@@ -6,63 +6,25 @@ import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmSpinnerImports } from '@spartan-ng/helm/spinner';
 import { ApiService } from '../../core/api.service';
 import { WorkspaceStore } from '../../core/workspace-store';
-import { Annotation, ClauseType, DocumentDetail, Sentence } from '../../core/models';
-import { tint } from '../../core/color.util';
+import { Annotation, ClauseType, DocumentDetail } from '../../core/models';
+import { isHeading } from '../../core/text.util';
+import { DocumentView, ViewSentence } from './document-view/document-view';
+import { ClausePopover } from './clause-popover/clause-popover';
+import { LabelingSidebar, ClauseSummaryRow } from './labeling-sidebar/labeling-sidebar';
 
-interface ViewSentence {
-  s: Sentence;
-  heading: boolean;
-  ann?: Annotation;
-  type?: ClauseType;
-}
-
+/**
+ * Labeling container: loads the routed document, owns the annotation state
+ * and API calls, and coordinates its three presentational children — the
+ * document view, the clause popover, and the right sidebar.
+ */
 @Component({
   selector: 'app-labeling',
-  imports: [...HlmButtonImports, ...HlmSpinnerImports],
+  imports: [...HlmButtonImports, ...HlmSpinnerImports, DocumentView, ClausePopover, LabelingSidebar],
   templateUrl: './labeling.html',
   host: {
     '(window:scroll)': 'onViewportChange()',
     '(window:resize)': 'onViewportChange()',
   },
-  styles: [
-    `
-      .doc-body {
-        font-size: 15px;
-        line-height: 2rem;
-      }
-      .s {
-        cursor: pointer;
-        border-radius: 3px;
-        padding: 0 1px;
-        transition: box-shadow 0.1s ease;
-      }
-      .s:hover {
-        box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 35%, transparent);
-      }
-      .s.selected {
-        box-shadow: 0 0 0 2px var(--primary);
-      }
-      .s.flash {
-        animation: flash 1.2s ease;
-      }
-      @keyframes flash {
-        20% {
-          box-shadow: 0 0 0 3px var(--primary);
-        }
-      }
-      .tag {
-        font-size: 10px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.03em;
-        border-radius: 999px;
-        padding: 1px 6px;
-        margin: 0 3px;
-        white-space: nowrap;
-        vertical-align: 2px;
-      }
-    `,
-  ],
 })
 export class Labeling {
   private readonly api = inject(ApiService);
@@ -112,19 +74,19 @@ export class Labeling {
       const ann = annMap.get(s.id);
       return {
         s,
-        heading: this.isHeading(s.text),
+        heading: isHeading(s.text),
         ann,
         type: ann ? typeMap.get(ann.clause_type_id) : undefined,
       };
     });
   });
 
-  readonly summary = computed<{ type: ClauseType; count: number }[]>(() => {
+  readonly summary = computed<ClauseSummaryRow[]>(() => {
     const counts = new Map<number, number>();
     for (const a of this.annBySentence().values()) {
       counts.set(a.clause_type_id, (counts.get(a.clause_type_id) ?? 0) + 1);
     }
-    const rows: { type: ClauseType; count: number }[] = [];
+    const rows: ClauseSummaryRow[] = [];
     for (const t of this.clauseTypes()) {
       const c = counts.get(t.id);
       if (c) rows.push({ type: t, count: c });
@@ -193,13 +155,10 @@ export class Labeling {
   }
 
   // ---- labeling interaction ----
-  clickSentence(v: ViewSentence, ev: MouseEvent): void {
-    if (v.heading) return;
-    ev.stopPropagation();
-    const r = (ev.currentTarget as HTMLElement).getBoundingClientRect();
-    this.popoverTop.set(r.bottom + 6);
-    this.popoverLeft.set(Math.max(8, Math.min(r.left, window.innerWidth - 296)));
-    this.selectedSentenceId.set(v.s.id);
+  onSentenceClick(e: { id: number; rect: DOMRect }): void {
+    this.popoverTop.set(e.rect.bottom + 6);
+    this.popoverLeft.set(Math.max(8, Math.min(e.rect.left, window.innerWidth - 296)));
+    this.selectedSentenceId.set(e.id);
   }
 
   applyType(typeId: number): void {
@@ -235,19 +194,25 @@ export class Labeling {
     this.closePopover();
   }
 
-  accept(ann: Annotation): void {
-    this.api.updateAnnotation(ann.id, { status: 'confirmed' }).subscribe({
-      next: (a) => this.upsertAnn(a),
-      error: () => toast.error('Failed'),
-    });
+  accept(): void {
+    const ann = this.selectedAnn();
+    if (ann) {
+      this.api.updateAnnotation(ann.id, { status: 'confirmed' }).subscribe({
+        next: (a) => this.upsertAnn(a),
+        error: () => toast.error('Failed'),
+      });
+    }
     this.closePopover();
   }
 
-  reject(ann: Annotation): void {
-    this.api.updateAnnotation(ann.id, { status: 'rejected' }).subscribe({
-      next: (a) => this.upsertAnn(a),
-      error: () => toast.error('Failed'),
-    });
+  reject(): void {
+    const ann = this.selectedAnn();
+    if (ann) {
+      this.api.updateAnnotation(ann.id, { status: 'rejected' }).subscribe({
+        next: (a) => this.upsertAnn(a),
+        error: () => toast.error('Failed'),
+      });
+    }
     this.closePopover();
   }
 
@@ -281,37 +246,5 @@ export class Labeling {
       }
       return [...list, a];
     });
-  }
-
-  // ---- view helpers ----
-  isHeading(text: string): boolean {
-    const t = text.trim();
-    if (/^#{1,6}\s/.test(t)) return true;
-    return /^\d+(\.\d+)*\.?\s+\S/.test(t) && t.length <= 60 && !/[.:;]$/.test(t);
-  }
-
-  displayHeading(text: string): string {
-    return text
-      .trim()
-      .replace(/^#{1,6}\s*/, '')
-      .replace(/\*\*/g, '');
-  }
-
-  titleize(filename: string): string {
-    const base = filename.replace(/\.[^.]+$/, '').replace(/^\d+[-_\s]*/, '');
-    const words = base.replace(/[-_]+/g, ' ').trim();
-    return words.replace(/\b\w/g, (c) => c.toUpperCase());
-  }
-
-  sentenceStyle(v: ViewSentence): string {
-    if (!v.ann || !v.type) return '';
-    if (v.ann.status === 'suggested') {
-      return `background-color:${tint(v.type.color, 0.06)};outline:1px dashed ${v.type.color};outline-offset:1px;border-radius:3px;`;
-    }
-    return `background-color:${tint(v.type.color, 0.14)};border-radius:3px;`;
-  }
-
-  tagStyle(color: string): string {
-    return `background-color:${color};color:#fff;`;
   }
 }

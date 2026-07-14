@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
-import { WorkspaceStore } from '../../core/workspace-store';
+import { WorkspaceStore } from '../../../core/workspace-store';
 
 /** Center placeholder shown when no document is selected. */
 @Component({

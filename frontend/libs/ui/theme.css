@@ -1,0 +1,99 @@
+/* ============================================================================
+   Legartis brand theme — SINGLE SOURCE OF TRUTH for the whole workspace.
+   Imported by both Tailwind entry points:
+     projects/app/src/styles.css            (the Contract Clause Tracker app)
+     projects/storybook-host/src/styles.css (the Storybook host)
+   Edit tokens HERE, never in the per-project entry files.
+
+   Exact hex tokens pulled from legartis.ai (Webflow). This single block
+   re-skins the whole Spartan-NG library.
+     primary  #fa5b05  neutrals #22252b→#f6f6f6  font Geist  radius 0.5rem
+   ========================================================================= */
+:root {
+  color-scheme: light;
+
+  --font-sans:
+    Geist, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+  --radius: 0.5rem;                 /* → button 6px / card 8px, matching Legartis */
+  --background: #ffffff;
+  --foreground: #22252b;            /* Legartis darkest-gray (cool near-black) */
+  --card: #ffffff;
+  --card-foreground: #22252b;
+  --popover: #ffffff;
+  --popover-foreground: #22252b;
+  /* ▼▼▼ BRAND COLOR — Legartis primary orange ▼▼▼ */
+  --primary: #fa5b05;
+  --primary-hover: #d14424;         /* Legartis darker orange (button hover) */
+  --primary-foreground: #ffffff;
+  /* ▲▲▲ BRAND COLOR ▲▲▲ */
+  --secondary: #f6f6f6;             /* Legartis lightest-gray */
+  --secondary-foreground: #22252b;
+  --muted: #f6f6f6;
+  --muted-foreground: #6e7483;      /* Legartis dark-gray */
+  --accent: #f3f3f3;                /* neutral hover surface (Legartis lighter-gray) */
+  --accent-foreground: #22252b;
+  --destructive: #ea384c;           /* Legartis red */
+  --border: #ececec;                /* Legartis light-gray */
+  --input: #ececec;
+  --ring: #fa5b05;                  /* focus ring in brand orange */
+  --sidebar: #f6f6f6;
+  --sidebar-foreground: #22252b;
+  --sidebar-primary: #fa5b05;       /* active nav item = brand orange */
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f3f3f3;
+  --sidebar-accent-foreground: #22252b;
+  --sidebar-border: #ececec;
+  --sidebar-ring: #fa5b05;
+}
+
+/* Dark mode is out of MVP scope (the Legartis site is light-only). This block is
+   left at the library's original defaults and is not used by the app. */
+:root.dark {
+  color-scheme: dark;
+
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  /* Brand color (dark mode) */
+  --primary: oklch(0.62 0.19 264);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.985 0 0);
+  --sidebar-primary-foreground: oklch(0.205 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Brand hover: primary buttons/links darken to the Legartis hover orange (#d14424).
+   The library's default button variant only shifts background on anchors; this unlayered,
+   high-specificity rule applies the brand hover to every primary button. Uses the token. */
+[data-slot='button'].bg-primary:hover {
+  background-color: var(--primary-hover);
+}

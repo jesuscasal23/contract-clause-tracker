@@ -10,7 +10,7 @@ export const routes: Routes = [
       {
         path: '',
         pathMatch: 'full',
-        loadComponent: () => import('./features/workspace/empty-state').then((m) => m.EmptyState),
+        loadComponent: () => import('./features/workspace/empty-state/empty-state').then((m) => m.EmptyState),
       },
       {
         path: 'documents/:id',
