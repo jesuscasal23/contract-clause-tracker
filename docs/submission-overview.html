@@ -1,0 +1,451 @@
+<title>Contract Clause Tracker — Submission Overview</title>
+<style>
+  :root {
+    --bg: #fffdfb;
+    --surface: #f7f5f1;
+    --surface-2: #f1eee9;
+    --ink: #23262c;
+    --muted: #6b7080;
+    --line: #e9e5e0;
+    --accent: #fa5b05;
+    --accent-text: #c94a00;
+    --code-bg: #f6f4f0;
+    --code-ink: #33373f;
+    --hl-bg-mix: 22%;
+    --chip-ink-mix: 100%;
+    --shadow: 0 1px 2px rgba(35, 38, 44, .05), 0 4px 16px rgba(35, 38, 44, .05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16171a; --surface: #1e2024; --surface-2: #24262b; --ink: #e9e7e3;
+      --muted: #9aa0ac; --line: #2c2f35; --accent: #ff8a4d; --accent-text: #ff8a4d;
+      --code-bg: #1b1d21; --code-ink: #cfd3da;
+      --hl-bg-mix: 30%; --chip-ink-mix: 62%; --shadow: none;
+    }
+  }
+  :root[data-theme="light"] {
+    --bg: #fffdfb; --surface: #f7f5f1; --surface-2: #f1eee9; --ink: #23262c;
+    --muted: #6b7080; --line: #e9e5e0; --accent: #fa5b05; --accent-text: #c94a00;
+    --code-bg: #f6f4f0; --code-ink: #33373f;
+    --hl-bg-mix: 22%; --chip-ink-mix: 100%;
+    --shadow: 0 1px 2px rgba(35, 38, 44, .05), 0 4px 16px rgba(35, 38, 44, .05);
+  }
+  :root[data-theme="dark"] {
+    --bg: #16171a; --surface: #1e2024; --surface-2: #24262b; --ink: #e9e7e3;
+    --muted: #9aa0ac; --line: #2c2f35; --accent: #ff8a4d; --accent-text: #ff8a4d;
+    --code-bg: #1b1d21; --code-ink: #cfd3da;
+    --hl-bg-mix: 30%; --chip-ink-mix: 62%; --shadow: none;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: "Geist", "Geist Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 16px; line-height: 1.65; -webkit-font-smoothing: antialiased;
+  }
+  code, .mono { font-family: "Geist Mono", ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace; }
+
+  .wrap { max-width: 840px; margin: 0 auto; padding: 0 24px; }
+
+  /* ---------- header ---------- */
+  header.top { padding: 56px 0 36px; border-bottom: 1px solid var(--line); }
+  .eyebrow { display: inline-block; font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--accent-text); margin-bottom: 14px; }
+  h1 { font-size: clamp(28px, 4.5vw, 40px); line-height: 1.15; font-weight: 700; letter-spacing: -.02em; margin: 0 0 14px; text-wrap: balance; max-width: 26ch; }
+  .lede { font-size: 17.5px; color: var(--muted); max-width: 62ch; margin: 0 0 22px; }
+  .lede strong { color: var(--ink); font-weight: 600; }
+
+  .meta-row { display: flex; flex-wrap: wrap; gap: 6px 22px; font-size: 13.5px; color: var(--muted); margin: 0 0 22px; }
+  .meta-row b { color: var(--ink); font-weight: 600; }
+
+  .stack-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .stack-chips span { font-size: 12.5px; font-weight: 500; padding: 4px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--muted); }
+  .stack-chips span b { color: var(--ink); font-weight: 600; }
+
+  /* ---------- hero demo ---------- */
+  .demo { margin: 30px 0 0; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); box-shadow: var(--shadow); overflow: hidden; }
+  .demo-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; padding: 10px 18px; border-bottom: 1px solid var(--line); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; font-weight: 600; color: var(--muted); }
+  .demo-body { padding: 20px 18px 18px; font-size: 16px; line-height: 1.85; }
+  .demo-body p { margin: 0; max-width: 68ch; }
+  .hl {
+    --clause: #b45309;
+    background: color-mix(in srgb, var(--clause) var(--hl-bg-mix), transparent);
+    box-shadow: inset 3px 0 0 var(--clause);
+    padding: 2px 4px 2px 8px; border-radius: 2px;
+  }
+  .hl.dashed { background: color-mix(in srgb, var(--clause) 8%, transparent); box-shadow: none; outline: 1.5px dashed var(--clause); outline-offset: 1px; }
+  .tag { display: inline-block; font-size: 10.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: color-mix(in srgb, var(--clause) var(--chip-ink-mix), white); margin-left: 6px; white-space: nowrap; }
+  .demo-meta { padding: 11px 18px; border-top: 1px dashed var(--line); font-size: 13px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px 22px; }
+  .demo-meta code { font-size: 12.5px; color: var(--ink); }
+
+  /* ---------- article ---------- */
+  main { padding: 10px 0 40px; }
+  main > section { padding: 34px 0 12px; }
+  main > section + section { border-top: 1px solid var(--line); }
+
+  .sec-eyebrow { font-size: 11.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--accent-text); margin: 0 0 6px; }
+  h2 { font-size: 25px; font-weight: 700; letter-spacing: -.015em; line-height: 1.2; margin: 0 0 14px; text-wrap: balance; }
+  h3 { font-size: 17.5px; font-weight: 650; letter-spacing: -.01em; margin: 26px 0 8px; }
+  p, ul { max-width: 68ch; }
+  p { margin: 0 0 13px; }
+  ul { margin: 0 0 14px; padding-left: 22px; }
+  li { margin-bottom: 6px; }
+  li::marker { color: var(--muted); }
+  a { color: var(--accent-text); text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--accent-text) 40%, transparent); text-underline-offset: 3px; }
+  a:hover { text-decoration-color: var(--accent-text); }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+  strong { font-weight: 650; }
+
+  p code, li code { background: var(--code-bg); border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; font-size: .86em; color: var(--code-ink); white-space: nowrap; }
+
+  pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px; padding: 13px 16px; overflow-x: auto; font-size: 13.5px; line-height: 1.6; color: var(--code-ink); margin: 0 0 16px; max-width: 68ch; }
+  pre code { background: none; border: none; padding: 0; font-size: inherit; color: inherit; white-space: pre; }
+
+  /* ---------- pipeline / stepper ---------- */
+  .pipe { list-style: none; margin: 4px 0 16px; padding: 0; counter-reset: step; max-width: 70ch; }
+  .pipe li { counter-increment: step; position: relative; padding: 0 0 18px 46px; margin: 0; }
+  .pipe li::before { content: counter(step); position: absolute; left: 0; top: 1px; width: 28px; height: 28px; border-radius: 50%; background: color-mix(in srgb, var(--accent) 14%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--line)); color: var(--accent-text); font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-variant-numeric: tabular-nums; }
+  .pipe li::after { content: ""; position: absolute; left: 14px; top: 32px; bottom: 2px; width: 1px; background: var(--line); }
+  .pipe li:last-child::after { display: none; }
+  .pipe li b { display: block; font-weight: 650; margin-bottom: 2px; font-size: 15.5px; }
+  .pipe li .d { color: var(--muted); font-size: 14.5px; }
+  .pipe li .d code { font-size: 12.5px; }
+
+  /* ---------- architecture diagram ---------- */
+  .arch { display: flex; flex-wrap: wrap; align-items: stretch; gap: 10px; margin: 4px 0 14px; }
+  .arch .node { flex: 1 1 180px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); padding: 14px 16px; box-shadow: var(--shadow); }
+  .arch .node .nh { font-weight: 700; font-size: 14.5px; margin-bottom: 2px; }
+  .arch .node .np { font-size: 12px; color: var(--muted); font-family: "Geist Mono", ui-monospace, Menlo, Consolas, monospace; }
+  .arch .node ul { margin: 8px 0 0; padding-left: 16px; font-size: 12.5px; color: var(--muted); max-width: none; }
+  .arch .node li { margin-bottom: 2px; }
+  .arch .arrow { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--accent-text); font-size: 12px; font-weight: 600; min-width: 64px; text-align: center; }
+  .arch .arrow .ln { font-size: 20px; line-height: 1; }
+  @media (max-width: 720px) { .arch .arrow { transform: rotate(90deg); min-width: 0; padding: 2px 0; } }
+
+  /* ---------- schema diagram ---------- */
+  .schema { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; margin: 4px 0 8px; }
+  .entity { border: 1px solid var(--line); border-radius: 8px; background: var(--surface); overflow: hidden; box-shadow: var(--shadow); font-size: 13px; }
+  .entity h3 { margin: 0; padding: 9px 14px; background: var(--surface-2); border-bottom: 1px solid var(--line); font-size: 13px; font-weight: 700; letter-spacing: .02em; font-family: "Geist Mono", ui-monospace, Menlo, Consolas, monospace; }
+  .entity ul { list-style: none; margin: 0; padding: 8px 0; max-width: none; }
+  .entity li { display: flex; justify-content: space-between; gap: 12px; padding: 2.5px 14px; margin: 0; font-family: "Geist Mono", ui-monospace, Menlo, Consolas, monospace; font-size: 12px; }
+  .entity li .f { color: var(--ink); }
+  .entity li .t { color: var(--muted); text-align: right; }
+  .entity li.key .f { font-weight: 700; }
+  .entity li.hot { background: color-mix(in srgb, var(--accent) 9%, transparent); }
+  .rel-note { font-size: 13px; color: var(--muted); margin: 6px 0 14px; max-width: none; }
+  .rel-note code { font-size: 12px; }
+
+  /* ---------- component tree ---------- */
+  .ctree { margin: 4px 0 6px; overflow-x: auto; padding-bottom: 4px; }
+  .ctree ul, .ctree li, .ctree .cd { max-width: none; }
+  .ctree ul { list-style: none; margin: 0; padding: 0 0 0 26px; position: relative; }
+  .ctree ul::before { content: ""; position: absolute; left: 9px; top: 0; bottom: 0; width: 1px; background: var(--line); }
+  .ctree li { position: relative; margin: 0; padding: 10px 0 0 12px; }
+  .ctree li::before { content: ""; position: absolute; left: -17px; top: 28px; width: 27px; height: 1px; background: var(--line); }
+  .ctree li:last-child::after { content: ""; position: absolute; left: -17px; top: 29px; bottom: -1px; width: 1px; background: var(--bg); }
+  .ctree .cnode { display: inline-block; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); box-shadow: var(--shadow); padding: 8px 14px 9px; vertical-align: top; }
+  .ctree .cnode.smart { border-left: 3px solid var(--accent); }
+  .ctree .cnode.ghost { background: transparent; box-shadow: none; border-style: dashed; }
+  .ctree .cn { font-family: "Geist Mono", ui-monospace, Menlo, Consolas, monospace; font-size: 13px; font-weight: 700; }
+  .ctree .cb { display: inline-block; font-size: 9.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; border-radius: 999px; padding: 1.5px 8px; margin-left: 8px; vertical-align: 1.5px; }
+  .ctree .cb.smart { background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent-text); }
+  .ctree .cb.pres { background: var(--surface-2); color: var(--muted); }
+  .ctree .cx { font-size: 11.5px; color: var(--muted); margin-left: 8px; }
+  .ctree .cd { font-size: 12.5px; color: var(--muted); margin-top: 3px; line-height: 1.5; max-width: 58ch; }
+  .ctree .cd code { font-size: 11px; }
+
+  /* ---------- decision blocks ---------- */
+  .decision { border: 1px solid var(--line); border-left: 3px solid var(--accent); background: var(--surface); border-radius: 0 8px 8px 0; padding: 15px 18px; margin: 0 0 14px; max-width: 70ch; }
+  .decision h3 { margin: 0 0 6px; font-size: 16px; }
+  .decision p { margin: 0 0 8px; font-size: 14.5px; }
+  .decision p:last-child { margin-bottom: 0; }
+  .decision .trade { color: var(--muted); }
+  .decision .trade b { color: var(--ink); font-weight: 650; }
+
+  footer.end { border-top: 1px solid var(--line); padding: 24px 0 60px; color: var(--muted); font-size: 13.5px; }
+  footer.end p { margin: 0 0 8px; }
+  footer.end a { color: var(--accent-text); }
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <div class="eyebrow">Take-home submission · Full-stack case study</div>
+    <h1>Contract Clause Tracker — overview &amp; key decisions</h1>
+    <p class="lede">A small full-stack app where legal teams upload contracts, label
+    clause-bearing sentences (<strong>Limitation of Liability</strong>, <strong>Termination for
+    Convenience</strong>, …), and browse every document by clause — designed so an
+    <strong>automatic labeling step drops in with no schema change</strong>.</p>
+    <div class="meta-row">
+      <span>By <b>Jesus Casal</b></span>
+      <span>Repo: <a href="https://github.com/jesuscasal23/contract-clause-tracker">github.com/jesuscasal23/contract-clause-tracker</a></span>
+      <span>Runs with <b>one command</b>: <code class="mono">docker compose up --build</code></span>
+    </div>
+    <div class="stack-chips">
+      <span><b>FastAPI</b> + SQLModel</span>
+      <span><b>PostgreSQL 16</b></span>
+      <span><b>Angular 21</b> · zoneless · signals</span>
+      <span><b>Spartan-NG</b> UI, re-skinned to the Legartis brand</span>
+      <span><b>pysbd</b> segmentation</span>
+      <span><b>Docker Compose</b> · 3 services</span>
+    </div>
+
+    <div class="demo">
+      <div class="demo-bar">
+        <span>The product in one picture</span>
+        <span class="mono" style="text-transform:none; letter-spacing:0; font-weight:500;">01-master-services-agreement.txt</span>
+      </div>
+      <div class="demo-body">
+        <p>The receiving party shall not disclose such Confidential Information to any third party
+        without the prior written consent of the disclosing party.
+        <span class="hl" style="--clause:#b45309">In no event shall either party be liable to the
+        other for any indirect, incidental, special, or consequential damages arising out of or
+        related to this Agreement.<span class="tag" style="--clause:#b45309">Limitation of Liability</span></span>
+        <span class="hl dashed" style="--clause:#1d4ed8">Either party may terminate this Agreement
+        for convenience upon sixty days notice.<span class="tag" style="--clause:#1d4ed8">Termination · suggested</span></span></p>
+      </div>
+      <div class="demo-meta">
+        <span>solid = labeled by a person (<code>confirmed</code>)</span>
+        <span>dashed = proposed by a model (<code>suggested</code>) — Accept / Reject</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <main>
+
+    <section id="what">
+      <p class="sec-eyebrow">What it does</p>
+      <h2>Upload, label, browse — one workspace</h2>
+      <ol class="pipe">
+        <li><b>Upload a contract (.txt / .md)</b>
+          <span class="d">The text is stored verbatim and segmented into sentences once, at upload —
+          <code>pysbd</code> handles the legal-text traps (<code>Inc.</code>, <code>e.g.</code>,
+          <code>99.9%</code>, <code>Section 3.2</code>).</span></li>
+        <li><b>Label clause-bearing sentences</b>
+          <span class="d">Click a sentence → an in-place popover → pick a clause type from a seeded
+          taxonomy of seven. Labels render as colored highlights; a sidebar shows the live
+          per-document clause summary.</span></li>
+        <li><b>Browse the whole corpus</b>
+          <span class="d">Every document with its clause counts, plus search, filter-by-clause and
+          group-by-clause — all in a persistent left panel, so switching documents never leaves the
+          page.</span></li>
+      </ol>
+    </section>
+
+    <section id="architecture">
+      <p class="sec-eyebrow">Architecture</p>
+      <h2>Three containers, one command</h2>
+      <div class="arch">
+        <div class="node">
+          <div class="nh">Angular SPA</div>
+          <div class="np">nginx · :4200</div>
+          <ul><li>Angular 21, zoneless, signals</li><li>Spartan-NG components</li><li>3-column workspace</li></ul>
+        </div>
+        <div class="arrow"><span class="ln">&rarr;</span>HTTP/JSON<br>CORS</div>
+        <div class="node">
+          <div class="nh">FastAPI</div>
+          <div class="np">uvicorn · :8000</div>
+          <ul><li>SQLModel ORM</li><li>pysbd segmentation</li><li>9 endpoints, 3 routers</li></ul>
+        </div>
+        <div class="arrow"><span class="ln">&rarr;</span>SQLAlchemy<br>psycopg</div>
+        <div class="node">
+          <div class="nh">PostgreSQL 16</div>
+          <div class="np">:5432 · named volume</div>
+          <ul><li>4 tables</li><li>taxonomy + sample doc seeded on first start</li></ul>
+        </div>
+      </div>
+      <p>The backend is deliberately minimal — one FastAPI app, three routers, four tables
+      (<code>documents</code>, <code>sentences</code>, <code>clause_types</code>,
+      <code>annotations</code>), one segmentation module. Interactive API docs live at
+      <code>/docs</code>, and a fresh install seeds one sample contract so the app never opens
+      empty.</p>
+
+      <h3>Inside the SPA — two containers, six focused children</h3>
+      <p>The Angular app follows a strict container/presentational split: two components own the
+      data and the API calls, everything else receives inputs and emits intent. Each piece is a
+      small single-purpose file — and the shape the pair-programming extension builds on.</p>
+
+      <div class="ctree" role="img" aria-label="Angular component tree: the Workspace shell contains DocListPanel, UploadModal, DeleteDocumentDialog and a router outlet; the router outlet swaps EmptyState and Labeling; Labeling contains DocumentView, ClausePopover and LabelingSidebar.">
+        <div class="cnode smart">
+          <span class="cn">Workspace</span><span class="cb smart">container</span><span class="cx">the persistent shell</span>
+          <div class="cd">Owns the document list, server-side search (debounced), clause filter + grouping; orchestrates upload, delete and navigation.</div>
+        </div>
+        <ul>
+          <li><div class="cnode">
+            <span class="cn">DocListPanel</span><span class="cb pres">presentational</span><span class="cx">rendered twice — desktop aside + mobile drawer</span>
+            <div class="cd">Search box, clause filter, group toggle, document rows. All state lives in the shell, so the two instances never drift apart.</div>
+          </div></li>
+          <li><div class="cnode">
+            <span class="cn">UploadModal</span><span class="cb pres">self-contained</span>
+            <div class="cd">Drag-and-drop + picker behind an idle → busy → done state machine; two-way <code>[(open)]</code>, one <code>(uploaded)</code> event back.</div>
+          </div></li>
+          <li><div class="cnode">
+            <span class="cn">DeleteDocumentDialog</span><span class="cb pres">presentational</span>
+            <div class="cd">Confirm dialog — emits <code>(confirm)</code> / <code>(cancel)</code>; the shell makes the DELETE call.</div>
+          </div></li>
+          <li>
+            <div class="cnode ghost"><span class="cn">&lt;router-outlet&gt;</span><span class="cx">the swappable center</span></div>
+            <ul>
+              <li><div class="cnode">
+                <span class="cn">EmptyState</span><span class="cb pres">route ''</span>
+                <div class="cd">Placeholder when no document is selected.</div>
+              </div></li>
+              <li>
+                <div class="cnode smart">
+                  <span class="cn">Labeling</span><span class="cb smart">container</span><span class="cx">route 'documents/:id'</span>
+                  <div class="cd">Loads the routed document, owns annotations and all CRUD, guards stale responses, publishes the live summary to the store.</div>
+                </div>
+                <ul>
+                  <li><div class="cnode">
+                    <span class="cn">DocumentView</span><span class="cb pres">presentational</span>
+                    <div class="cd">The reading pane: sentence flow, clause highlights and tags; emits the clicked sentence + its screen rect.</div>
+                  </div></li>
+                  <li><div class="cnode">
+                    <span class="cn">ClausePopover</span><span class="cb pres">presentational</span>
+                    <div class="cd">Pick a type, Accept / Reject a suggestion, remove — five intent outputs, zero API calls.</div>
+                  </div></li>
+                  <li><div class="cnode">
+                    <span class="cn">LabelingSidebar</span><span class="cb pres">presentational</span>
+                    <div class="cd">Clause palette + live per-document summary; emits <code>(scrollTo)</code>.</div>
+                  </div></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+      <p class="rel-note">Shared <code>core/</code>: <code>WorkspaceStore</code> (three signals
+      linking shell &harr; labeling) · <code>ApiService</code> (all HTTP, one normalization
+      boundary) · typed DTOs · pure color/text utils.</p>
+    </section>
+
+    <section id="schema">
+      <p class="sec-eyebrow">Data model</p>
+      <h2>Four tables, one invariant</h2>
+      <p>Every offset indexes into the document's verbatim <code>raw_text</code>, and
+      <code>raw_text[char_start:char_end] == text</code> holds for every sentence and every
+      annotation. Highlighted fields are the design-critical ones.</p>
+
+      <div class="schema">
+        <div class="entity">
+          <h3>documents</h3>
+          <ul>
+            <li class="key"><span class="f">id</span><span class="t">PK</span></li>
+            <li><span class="f">filename</span><span class="t">text</span></li>
+            <li><span class="f">format</span><span class="t">'txt' | 'md'</span></li>
+            <li class="hot"><span class="f">raw_text</span><span class="t">verbatim</span></li>
+            <li><span class="f">created_at</span><span class="t">datetime</span></li>
+          </ul>
+        </div>
+        <div class="entity">
+          <h3>sentences</h3>
+          <ul>
+            <li class="key"><span class="f">id</span><span class="t">PK</span></li>
+            <li><span class="f">document_id</span><span class="t">FK &crarr; cascade</span></li>
+            <li><span class="f">ordinal</span><span class="t">0-based</span></li>
+            <li class="hot"><span class="f">char_start / end</span><span class="t">&rarr; raw_text</span></li>
+            <li><span class="f">text</span><span class="t">denormalized</span></li>
+          </ul>
+        </div>
+        <div class="entity">
+          <h3>clause_types</h3>
+          <ul>
+            <li class="key"><span class="f">id</span><span class="t">PK</span></li>
+            <li><span class="f">name</span><span class="t">unique</span></li>
+            <li><span class="f">description</span><span class="t">nullable</span></li>
+            <li><span class="f">color</span><span class="t">ink hex</span></li>
+            <li><span class="f">is_active</span><span class="t">bool</span></li>
+            <li><span class="f">created_at</span><span class="t">datetime</span></li>
+          </ul>
+        </div>
+        <div class="entity">
+          <h3>annotations</h3>
+          <ul>
+            <li class="key"><span class="f">id</span><span class="t">PK</span></li>
+            <li><span class="f">sentence_id</span><span class="t">FK &crarr; cascade</span></li>
+            <li><span class="f">clause_type_id</span><span class="t">FK</span></li>
+            <li class="hot"><span class="f">char_start / end</span><span class="t">copied</span></li>
+            <li class="hot"><span class="f">source</span><span class="t">'user' | 'model'</span></li>
+            <li class="hot"><span class="f">status</span><span class="t">confirmed | suggested | rejected</span></li>
+            <li class="hot"><span class="f">confidence</span><span class="t">float, NULL for user</span></li>
+            <li><span class="f">created_at</span><span class="t">datetime</span></li>
+          </ul>
+        </div>
+      </div>
+      <p class="rel-note">documents 1&mdash;N sentences 1&mdash;N annotations N&mdash;1 clause_types ·
+      <code>UNIQUE(document_id, ordinal)</code> · <code>UNIQUE(sentence_id, clause_type_id)</code></p>
+    </section>
+
+    <section id="decisions">
+      <p class="sec-eyebrow">Key decisions</p>
+      <h2>The four decisions that shaped the design</h2>
+
+      <div class="decision">
+        <h3>“A clause is a single sentence” constrains the unit of annotation, not the definition of a clause</h3>
+        <p>Most sentences carry <em>no</em> label; a few are tagged from a fixed taxonomy. The
+        system's job — for the human now, for a model later — is to find the needle sentences.</p>
+        <p class="trade"><b>Why it matters:</b> the taxonomy doubles as the dashboard's filter
+        vocabulary and a future model's fixed output space, and sentence rows become the unit that
+        humans and the model share.</p>
+      </div>
+
+      <div class="decision">
+        <h3>Data model: sentence rows that also carry character offsets</h3>
+        <p>Sentences are materialized as rows (stable ids, simple UI, trivial dashboard queries),
+        <em>and</em> every annotation copies its sentence's <code>char_start / char_end</code> into
+        the verbatim <code>raw_text</code>. The invariant
+        <code>raw_text[start:end] == text</code> is verified at upload and in tests.</p>
+        <p class="trade"><b>Why it matters:</b> if real clause extraction later needs free
+        (multi- or sub-sentence) spans, that's a constraint relaxation and a mechanical migration —
+        not a rewrite.</p>
+      </div>
+
+      <div class="decision">
+        <h3>Manual and automatic labels share one pipeline</h3>
+        <p><code>annotations</code> carries <code>source</code> (<code>user</code> |
+        <code>model</code>), <code>status</code> (<code>confirmed</code> | <code>suggested</code> |
+        <code>rejected</code>) and <code>confidence</code> from day one. Auto-labeling becomes:
+        insert <code>suggested</code> rows via the scaffolded
+        <code>POST /documents/{id}/auto-label</code>; the UI already renders them as dashed
+        highlights with Accept / Reject (a single <code>PATCH</code>).</p>
+        <p class="trade"><b>Why it matters:</b> human-in-the-loop review is exactly what legal teams
+        need — and the accept/reject stream becomes a ready-made training signal. Rejected labels
+        are kept, not deleted.</p>
+      </div>
+
+      <div class="decision">
+        <h3>Reuse a token-driven design system instead of hand-rolling components</h3>
+        <p>The UI is built on a Spartan-NG library (the Angular port of shadcn/ui) whose entire look
+        is driven by CSS design tokens — the Legartis palette (orange <code>#fa5b05</code>,
+        cool-slate neutrals, Geist, tight radii) was taken from the live site and applied in one
+        token block. The workspace ships a Storybook workbench for the full component set.</p>
+        <p class="trade"><b>Why it matters:</b> accessible, consistent components for free, and the
+        time saved went into the graded centerpiece — the labeling UX.</p>
+      </div>
+    </section>
+
+    <section id="next">
+      <p class="sec-eyebrow">What's next</p>
+      <h2>The automatic-labeling step, ready to land</h2>
+      <p><code>POST /documents/{id}/auto-label</code> is scaffolded as a documented stub: run a
+      classifier over a document's sentences, insert <code>source='model',
+      status='suggested'</code> annotations with a confidence, and the existing UI takes over.
+      Model options, cheapest first: few-shot LLM classification per sentence; embeddings + nearest
+      clause-type prototype; or a classifier fine-tuned on the accumulated confirmed labels.</p>
+    </section>
+
+  </main>
+</div>
+
+<footer class="end">
+  <div class="wrap">
+    <p><strong>Try it:</strong> clone the
+    <a href="https://github.com/jesuscasal23/contract-clause-tracker">repo</a> and run
+    <code class="mono">docker compose up --build</code> → app on
+    <code class="mono">localhost:4200</code>, API docs on <code class="mono">localhost:8000/docs</code>.
+    Full detail in the README and <code class="mono">docs/requirements.md</code>.</p>
+    <p>Jesus Casal · <a href="mailto:jmct.1997@gmail.com">jmct.1997@gmail.com</a> · This page uses
+    the same design tokens as the app.</p>
+  </div>
+</footer>
