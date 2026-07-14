@@ -2,6 +2,7 @@
 
 from datetime import datetime, timezone
 from enum import Enum
+from typing import ClassVar
 
 from sqlmodel import Field, Relationship, SQLModel, UniqueConstraint
 
@@ -27,7 +28,7 @@ class AnnotationStatus(str, Enum):
 
 
 class Document(SQLModel, table=True):
-    __tablename__ = "documents"
+    __tablename__: ClassVar[str] = "documents"
 
     id: int | None = Field(default=None, primary_key=True)
     filename: str
@@ -43,7 +44,7 @@ class Document(SQLModel, table=True):
 
 
 class Sentence(SQLModel, table=True):
-    __tablename__ = "sentences"
+    __tablename__: ClassVar[str] = "sentences"
     __table_args__ = (UniqueConstraint("document_id", "ordinal"),)
 
     id: int | None = Field(default=None, primary_key=True)
@@ -60,7 +61,7 @@ class Sentence(SQLModel, table=True):
 
 
 class ClauseType(SQLModel, table=True):
-    __tablename__ = "clause_types"
+    __tablename__: ClassVar[str] = "clause_types"
 
     id: int | None = Field(default=None, primary_key=True)
     name: str = Field(unique=True, index=True)
@@ -71,7 +72,7 @@ class ClauseType(SQLModel, table=True):
 
 
 class Annotation(SQLModel, table=True):
-    __tablename__ = "annotations"
+    __tablename__: ClassVar[str] = "annotations"
     __table_args__ = (UniqueConstraint("sentence_id", "clause_type_id"),)
 
     id: int | None = Field(default=None, primary_key=True)

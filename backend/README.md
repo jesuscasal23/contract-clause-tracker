@@ -1,26 +1,31 @@
 # Contract Clause Tracker — Backend
 
-FastAPI + SQLModel + SQLite backend for the Contract Clause Tracker. Uploaded
+FastAPI + SQLModel + PostgreSQL backend for the Contract Clause Tracker. Uploaded
 contracts are stored verbatim, segmented into sentences once (pysbd), and sentences
 are labeled with clause types from a seeded taxonomy.
 
 ## Run locally
 
 ```bash
+# Start PostgreSQL (from the repository root)
+docker compose up -d db
+
 cd backend
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 .venv/bin/uvicorn app.main:app --reload
 ```
 
-API at http://localhost:8000 (interactive docs at `/docs`). The SQLite file lives at
-`backend/data/clause_tracker.db` (override with `DATABASE_URL`). Tables are created
-and the clause-type taxonomy seeded on startup; both are idempotent.
+API at http://localhost:8000 (interactive docs at `/docs`). The backend connects to
+PostgreSQL at `postgresql+psycopg://postgres:postgres@localhost:5433/clause_tracker`
+by default — the compose `db` service published on host port 5433 (override with
+`DATABASE_URL`). Tables are created and the clause-type taxonomy seeded on startup;
+both are idempotent.
 
 Or from the repository root:
 
 ```bash
-docker-compose up
+docker compose up
 ```
 
 ## Tests
@@ -32,7 +37,8 @@ docker-compose up
 Covers the critical paths: upload → segmentation (offsets slice back to the sentence
 text, legal-text traps like `Inc.`, `e.g.,`, `99.9%`, `$185,000`), annotation
 create/update/delete (defaults, offset copy, unique constraint), and dashboard
-search / filter / group-by / cascade delete. Tests run against an in-memory SQLite.
+search / filter / group-by / cascade delete. Tests run against an in-memory SQLite,
+so they need no running database server.
 
 ## API
 
@@ -72,4 +78,4 @@ search / filter / group-by / cascade delete. Tests run against an in-memory SQLi
 - **Status semantics**: dashboard summaries exclude `rejected` annotations unless
   `?status=rejected` is asked for explicitly.
 - **Kept out on purpose** (minimal backend): no auth, no Alembic (schema is created
-  on startup), no Postgres (schema is portable), no pagination (corpus-scale MVP).
+  on startup), no pagination (corpus-scale MVP).

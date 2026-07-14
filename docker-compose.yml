@@ -1,10 +1,29 @@
 services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: clause_tracker
+    ports:
+      - "5433:5432"  # host 5433 (5432 is often taken); local (non-Docker) backend dev reuses this db
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d clause_tracker"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
   backend:
     build: ./backend
     ports:
       - "8000:8000"
-    volumes:
-      - backend-data:/app/data
+    environment:
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@db:5432/clause_tracker
+    depends_on:
+      db:
+        condition: service_healthy
 
   frontend:
     build: ./frontend
@@ -17,4 +36,4 @@ services:
     # CORS allow-list already includes http://localhost:4200.
 
 volumes:
-  backend-data:
+  db-data:
