@@ -5,7 +5,7 @@ from pathlib import Path
 
 from sqlmodel import Session, select
 
-from app.models import ClauseType, Document, Sentence
+from app.models import ClauseType, Document, DocumentFormat, Sentence
 from app.segmentation import segment_text
 
 SEED_CLAUSE_TYPES: list[dict[str, str]] = [
@@ -58,7 +58,13 @@ def seed_clause_types(session: Session) -> None:
     existing = set(session.exec(select(ClauseType.name)).all())
     for entry in SEED_CLAUSE_TYPES:
         if entry["name"] not in existing:
-            session.add(ClauseType(**entry))
+            session.add(
+                ClauseType(
+                    name=entry["name"],
+                    description=entry["description"],
+                    color=entry["color"],
+                )
+            )
     session.commit()
 
 
@@ -70,7 +76,7 @@ def seed_example_documents(session: Session) -> None:
         session.add(
             Document(
                 filename=filename,
-                format=Path(filename).suffix.lstrip("."),
+                format=DocumentFormat(Path(filename).suffix.lstrip(".")),
                 raw_text=raw_text,
                 sentences=[
                     Sentence(

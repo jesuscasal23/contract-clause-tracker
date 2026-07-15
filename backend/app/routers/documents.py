@@ -5,10 +5,18 @@ from fastapi import APIRouter, HTTPException, Query, UploadFile, status
 from sqlmodel import col, func, or_, select
 
 from app.database import SessionDep
-from app.models import Annotation, AnnotationStatus, ClauseType, Document, Sentence
+from app.models import (
+    Annotation,
+    AnnotationStatus,
+    ClauseType,
+    Document,
+    DocumentFormat,
+    Sentence,
+)
 from app.schemas import (
     ClauseCount,
     ClauseTypeGroup,
+    ClauseTypeRead,
     DocumentDetail,
     DocumentListResponse,
     DocumentSummary,
@@ -18,7 +26,10 @@ from app.segmentation import segment_text
 
 router = APIRouter(prefix="/documents", tags=["documents"])
 
-ALLOWED_EXTENSIONS = {".txt": "txt", ".md": "md"}
+ALLOWED_EXTENSIONS: dict[str, DocumentFormat] = {
+    ".txt": DocumentFormat.txt,
+    ".md": DocumentFormat.md,
+}
 
 
 def _get_document_or_404(document_id: int, session: SessionDep) -> Document:
@@ -112,7 +123,7 @@ def list_documents(
     )
     counts_by_document: dict[int, dict[int, int]] = {}
     for document_id, clause_type_id, count in session.exec(annotation_counts).all():
-        counts_by_document.setdefault(document_id, {})[clause_type_id] = count
+        counts_by_document.setdefault(document_id or 0, {})[clause_type_id] = count
 
     clause_types = {
         ct.id: ct for ct in session.exec(select(ClauseType)).all() if ct.id is not None
@@ -156,7 +167,9 @@ def list_documents(
         ]
         if matching:
             groups.append(
-                ClauseTypeGroup(clause_type=ct.model_dump(), documents=matching)
+                ClauseTypeGroup(
+                    clause_type=ClauseTypeRead.model_validate(ct), documents=matching
+                )
             )
     return GroupedDocumentListResponse(groups=groups)
 

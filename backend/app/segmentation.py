@@ -14,9 +14,10 @@ offsets always index into the verbatim raw text.
 
 import re
 from dataclasses import dataclass
-from typing import Iterator
+from typing import Iterator, cast
 
 import pysbd
+from pysbd.utils import TextSpan
 
 _segmenter = pysbd.Segmenter(language="en", clean=False, char_span=True)
 
@@ -75,7 +76,9 @@ def segment_text(raw_text: str) -> list[SentenceSpan]:
         if not cleaned.strip():
             continue
         cursor = 0
-        for piece in _segmenter.segment(cleaned):
+        # pysbd annotates segment() as returning strings, but with char_span=True
+        # it returns TextSpan objects (sent/start/end).
+        for piece in cast("list[TextSpan]", _segmenter.segment(cleaned)):
             start = piece.start
             # Verify the offset; recover via search if pysbd's span drifted.
             if cleaned[start : start + len(piece.sent)] != piece.sent:

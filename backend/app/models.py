@@ -2,7 +2,6 @@
 
 from datetime import datetime, timezone
 from enum import Enum
-from typing import ClassVar
 
 from sqlmodel import Field, Relationship, SQLModel, UniqueConstraint
 
@@ -28,7 +27,7 @@ class AnnotationStatus(str, Enum):
 
 
 class Document(SQLModel, table=True):
-    __tablename__: ClassVar[str] = "documents"
+    __tablename__ = "documents"  # pyright: ignore[reportAssignmentType]  # plain str is the SQLModel idiom
 
     id: int | None = Field(default=None, primary_key=True)
     filename: str
@@ -44,11 +43,14 @@ class Document(SQLModel, table=True):
 
 
 class Sentence(SQLModel, table=True):
-    __tablename__: ClassVar[str] = "sentences"
+    __tablename__ = "sentences"  # pyright: ignore[reportAssignmentType]  # plain str is the SQLModel idiom
     __table_args__ = (UniqueConstraint("document_id", "ordinal"),)
 
     id: int | None = Field(default=None, primary_key=True)
-    document_id: int = Field(foreign_key="documents.id", ondelete="CASCADE", index=True)
+    # Optional at construction (filled by the relationship on flush); NOT NULL in the DB.
+    document_id: int | None = Field(
+        default=None, foreign_key="documents.id", nullable=False, ondelete="CASCADE", index=True
+    )
     ordinal: int  # 0-based position within the document
     char_start: int  # offset into documents.raw_text
     char_end: int
@@ -61,7 +63,7 @@ class Sentence(SQLModel, table=True):
 
 
 class ClauseType(SQLModel, table=True):
-    __tablename__: ClassVar[str] = "clause_types"
+    __tablename__ = "clause_types"  # pyright: ignore[reportAssignmentType]  # plain str is the SQLModel idiom
 
     id: int | None = Field(default=None, primary_key=True)
     name: str = Field(unique=True, index=True)
@@ -72,7 +74,7 @@ class ClauseType(SQLModel, table=True):
 
 
 class Annotation(SQLModel, table=True):
-    __tablename__: ClassVar[str] = "annotations"
+    __tablename__ = "annotations"  # pyright: ignore[reportAssignmentType]  # plain str is the SQLModel idiom
     __table_args__ = (UniqueConstraint("sentence_id", "clause_type_id"),)
 
     id: int | None = Field(default=None, primary_key=True)

@@ -3,7 +3,7 @@
 from sqlalchemy.pool import StaticPool
 from sqlmodel import Session, SQLModel, create_engine, select
 
-from app.models import Document, Sentence
+from app.models import Document, DocumentFormat, Sentence
 from app.seed import SEED_DOCUMENTS, seed_example_documents
 
 
@@ -41,7 +41,9 @@ def test_seed_is_idempotent() -> None:
 
 def test_seed_skips_when_documents_exist() -> None:
     with make_session() as session:
-        session.add(Document(filename="user.txt", format="txt", raw_text="Hello."))
+        session.add(
+            Document(filename="user.txt", format=DocumentFormat.txt, raw_text="Hello.")
+        )
         session.commit()
 
         seed_example_documents(session)
