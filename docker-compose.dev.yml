@@ -1,0 +1,28 @@
+# Dev override — everything in Docker, with hot reload:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+#
+# Backend: bind-mounts ./backend/app and runs uvicorn with --reload.
+# Frontend: runs the Angular dev server (HMR) from the image's `build` stage
+# instead of the nginx production image; projects/ and libs/ are bind-mounted,
+# so component/template/style edits reload instantly. Changes to config files
+# baked into the image (angular.json, tsconfig, package.json/lockfile,
+# backend requirements.txt) still need an `up --build`.
+services:
+  backend:
+    volumes:
+      - ./backend/app:/app/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  frontend:
+    build:
+      context: ./frontend
+      target: build
+    command: pnpm ng serve app --host 0.0.0.0 --port 4200
+    environment:
+      NG_CLI_ANALYTICS: "false"
+    ports: !override
+      - "4200:4200"
+    volumes:
+      - ./frontend/projects:/app/projects
+      - ./frontend/libs:/app/libs
